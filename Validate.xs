@@ -112,7 +112,7 @@
 static void
 bootinit()
 {
-    char *str;
+    char* str;
     HV* stash;
 
     /* define constants */
@@ -134,7 +134,7 @@ bootinit()
 static bool
 no_validation()
 {
-    SV * no_v;
+    SV* no_v;
 
     no_v = perl_get_sv("Params::Validate::NO_VALIDATION", 0);
     if (! no_v)
@@ -267,7 +267,7 @@ article(SV* string)
     return "a";
 }
 
-static SV *
+static SV*
 get_on_fail(HV* options)
 {
     SV** temp;
@@ -386,7 +386,7 @@ validate_isa(SV* value, SV* package, SV* id, HV* options)
 static IV
 validate_can(SV* value, SV* method, SV* id, HV* options)
 {
-    char *name;
+    char* name;
     IV ok = 1;
     HV* pkg = NULL;
 
@@ -411,7 +411,7 @@ validate_can(SV* value, SV* method, SV* id, HV* options)
 
     ok = 0;
     if (pkg) {
-        GV *gv;
+        GV* gv;
 
         gv = gv_fetchmethod_autoload(pkg, name, FALSE);
         if (gv && isGV(gv)) ok = 1;
@@ -623,7 +623,7 @@ append_hash2hash(HV* in, HV* out)
     hv_iterinit(in);
     while (he = hv_iternext(in)) {
         if (!hv_store_ent(out, HeSVKEY_force(he),
-                         SvREFCNT_inc(HeVAL(he)), HeHASH(he))) {
+                          SvREFCNT_inc(HeVAL(he)), HeHASH(he))) {
             SvREFCNT_dec(HeVAL(he));
             croak("Cannot add new key to hash");
         }
@@ -683,7 +683,6 @@ get_options(HV* options)
         pkg = "main";
     }
 #endif
-
     /* get package specific options */
     OPTIONS = perl_get_hv("Params::Validate::OPTIONS", 1);
     if (temp = hv_fetch(OPTIONS, pkg, strlen(pkg), 0)) {
@@ -703,16 +702,98 @@ get_options(HV* options)
     return ret;
 }
 
-/* convert parameter names when 'ignore_case' or 'strip_leading'
-   options are set */
-static HV*
-normalize_named(HV* p, HV* options)
+static SV*
+normalize_one_key(SV* key, SV* normalize_func, SV* strip_leading, IV ignore_case)
 {
-    SV** temp;
+    SV* ret;
+    STRLEN len_sl;
+    STRLEN len;
+    char *rawstr_sl;
+    char *rawstr;
+
+    ret = newSVsv(key);
+
+    /* if normalize_func is provided, ignore the other options */
+    if (normalize_func) {
+        SV* ok;
+
+        dSP;
+
+        PUSHMARK(SP);
+        XPUSHs(ret);
+        PUTBACK;
+        if (! perl_call_sv(SvRV(normalize_func), G_SCALAR)) {
+            croak("The normalize_keys callback did not return anything");
+        }
+        SPAGAIN;
+        ok = POPs;
+        PUTBACK;
+
+        if (! SvOK(ok))
+            croak("The normalize_keys callback did not return a defined value");
+
+        return ok;
+    } else if (ignore_case || strip_leading) {
+        if (ignore_case) {
+            STRLEN i;
+
+            rawstr = SvPV(ret, len);
+            for (i = 0; i < len; i++) {
+                /* should this account for UTF8 strings? */
+                *(rawstr + i) = toLOWER(*(rawstr + i));
+            }
+        }
+
+        if (strip_leading) {
+            rawstr_sl = SvPV(strip_leading, len_sl);
+            rawstr = SvPV(ret, len);
+
+            if (len > len_sl && strnEQ(rawstr_sl, rawstr, len_sl)) {
+                ret = sv_2mortal(newSVpvn(rawstr + len_sl, len - len_sl));
+            }
+        }
+    }
+
+    return ret;
+}
+
+static HV*
+normalize_hash_keys(HV* p, SV* normalize_func, SV* strip_leading, IV ignore_case)
+{
+    SV* normalized;
+    HE* he;
+    HV* norm_p;
+
+    if (!normalize_func && !ignore_case && !strip_leading) {
+        return p;
+    }
+
+    norm_p = (HV*) sv_2mortal((SV*) newHV());
+    hv_iterinit(p);
+    while (he = hv_iternext(p)) {
+        normalized =
+          normalize_one_key(HeSVKEY_force(he), normalize_func, strip_leading, ignore_case);
+
+        if (! hv_store_ent(norm_p, normalized, SvREFCNT_inc(HeVAL(he)), 0)) {
+            SvREFCNT_dec(HeVAL(he));
+            croak("Cannot add new key to hash");
+        }
+    }
+    return norm_p;
+}
+
+static IV
+validate(HV* p, HV* specs, HV* options, HV* ret)
+{
+    AV* missing;
+    AV* unmentioned;
+    HE* he;
+    HE* he1;
     IV ignore_case;
     SV* strip_leading;
-    STRLEN len_sl;
-    char* rawstr_sl;
+    IV allow_extra;
+    SV** temp;
+    SV* normalize_func;
 
     if (temp = hv_fetch(options, "ignore_case", 11, 0)) {
         SvGETMAGIC(*temp);
@@ -723,64 +804,25 @@ normalize_named(HV* p, HV* options)
     if (temp = hv_fetch(options, "strip_leading", 13, 0)) {
         SvGETMAGIC(*temp);
         if (SvOK(*temp)) strip_leading = *temp;
-        if (strip_leading) {
-            rawstr_sl = SvPV(strip_leading, len_sl);
-        }
     } else {
         strip_leading = NULL;
     }
 
-    if (ignore_case || strip_leading) {
-        HE* he;
-        HV* p1;
-
-        p1 = (HV*) sv_2mortal((SV*) newHV());
-        hv_iterinit(p);
-        while (he = hv_iternext(p)) {
-            STRLEN len;
-            char* rawstr;
-            SV* sv;
-
-            sv = HeSVKEY_force(he);
-            if (ignore_case) {
-                STRLEN i;
-
-                rawstr = SvPV(sv, len);
-                for(i = 0; i < len; i ++) {
-                    /* should this account for UTF8 strings? */
-                    *(rawstr + i) = toLOWER(*(rawstr + i));
-                }
-                sv = sv_2mortal(newSVpvn(rawstr, len));
-            }
-            if (strip_leading) {
-                rawstr = SvPV(sv, len);
-                if (len > len_sl && strnEQ(rawstr_sl, rawstr, len_sl)) {
-                    sv = sv_2mortal(newSVpvn(rawstr + len_sl, len - len_sl));
-                }
-            }
-            if (! hv_store_ent(p1, sv, SvREFCNT_inc(HeVAL(he)), 0)) {
-                SvREFCNT_dec(HeVAL(he));
-                croak("Cannot add new key to hash");
-            }
+    if(temp = hv_fetch(options, "normalize_keys", 14, 0)) {
+        SvGETMAGIC(*temp);
+        if(SvROK(*temp) && SvTYPE(SvRV(*temp)) == SVt_PVCV) {
+            normalize_func = *temp;
+        } else {
+            normalize_func = NULL;
         }
-        return p1;
+    } else {
+        normalize_func = NULL;
     }
-     
-    return p;
-}
 
-static IV
-validate(HV* p, HV* specs, HV* options, HV* ret)
-{
-    AV* missing;
-    AV* unmentioned;
-    HE* he;
-    HE* he1;
-
-    IV allow_extra;
-    SV** temp;
-
-    p = normalize_named(p, options);
+    if (normalize_func || ignore_case || strip_leading) {
+        p = normalize_hash_keys(p, normalize_func, strip_leading, ignore_case);
+        specs = normalize_hash_keys(specs, normalize_func, strip_leading, ignore_case);
+    }
 
     if (temp = hv_fetch(options, "allow_extra", 11, 0)) {
         SvGETMAGIC(*temp);
@@ -814,16 +856,27 @@ validate(HV* p, HV* specs, HV* options, HV* ret)
         if (!no_validation()) {
             /* check if this parameter is defined in spec and if it is
                then validate it using spec */
-            if (he1 = hv_fetch_ent(specs, HeSVKEY_force(he), 0, HeHASH(he))) {
-                SvGETMAGIC(HeVAL(he1));
+            he1 = hv_fetch_ent(specs, HeSVKEY_force(he), 0, HeHASH(he));
+            if(he1) {
                 if (SvROK(HeVAL(he1)) && SvTYPE(SvRV(HeVAL(he1))) == SVt_PVHV) {
                     SV* buffer;
                     HV* spec;
+                    char* value;
 
                     spec = (HV*) SvRV(HeVAL(he1));
                     buffer = sv_2mortal(newSVpv("The '", 0));
                     sv_catsv(buffer, HeSVKEY_force(he));
-                    sv_catpv(buffer, "' parameter");
+                    sv_catpv(buffer, "' parameter (");
+
+                    if(SvOK(HeVAL(he))) {
+                        value = SvPV_nolen(HeVAL(he));
+                        sv_catpv(buffer, "\"");
+                        sv_catpv(buffer, value);
+                        sv_catpv(buffer, "\"");
+                    } else {
+                        sv_catpv(buffer, "undef");
+                    }
+                    sv_catpv(buffer, ")");
 
                     if (! validate_one_param(HeVAL(he), spec, buffer, options))
                         return 0;
@@ -1018,7 +1071,9 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret)
             value = *av_fetch(p, i, 1);
             SvGETMAGIC(value);
             if (!no_validation() && complex_spec) {
-                buffer = sv_2mortal(newSVpvf("Parameter #%d", (int) i + 1));
+                buffer = sv_2mortal(newSVpvf("Parameter #%d (\"", (int) i + 1));
+                sv_catpv(buffer, SvPV_nolen(value));
+                sv_catpv(buffer, "\")");
 
                 if (! validate_one_param(value, (HV*) SvRV(spec), buffer, options))
                     return 0;

@@ -119,7 +119,8 @@ sub validate_pos (\@@)
 
 	if ( $_ <= $#p )
 	{
-	    _validate_one_param( $p[$_], $spec, "Parameter #" . ($_ + 1) );
+	    my $value = defined $p[$_] ? qq|"$p[$_]"| : 'undef';
+	    _validate_one_param( $p[$_], $spec, "Parameter #" . ($_ + 1) . " ($value)");
 	}
 
 	$p[$_] = $spec->{default} if $_ > $#p && exists $spec->{default};
@@ -163,7 +164,12 @@ sub validate (\@$)
         }
     }
 
-    if ( $options->{ignore_case} || $options->{strip_leading} )
+    if ( $options->{normalize_keys} )
+    {
+        $specs = _normalize_callback( $specs, $options->{normalize_keys} );
+        $p = _normalize_callback( $p, $options->{normalize_keys} );
+    }
+    elsif ( $options->{ignore_case} || $options->{strip_leading} )
     {
 	$specs = _normalize_named($specs);
 	$p = _normalize_named($p);
@@ -174,7 +180,7 @@ sub validate (\@$)
         return
             ( wantarray ?
               (
-               # this is a has containing just the defaults
+               # this is a hash containing just the defaults
                ( map { $_ => $specs->{$_}->{default} }
                  grep { ref $specs->{$_} && exists $specs->{$_}->{default} }
                  keys %$specs
@@ -259,7 +265,8 @@ sub validate (\@$)
         # absence of the parameter.
         elsif (ref $spec)
         {
-	    _validate_one_param( $p->{$key}, $spec, "The '$key' parameter" );
+	    my $value = defined $p->{$key} ? qq|"$p->{$key}"| : 'undef';
+	    _validate_one_param( $p->{$key}, $spec, "The '$key' parameter ($value)" );
 	}
     }
 
@@ -305,6 +312,26 @@ sub validate_with
         # handle either one properly
 	return &validate( $p{params}, $p{spec} );
     }
+}
+
+sub _normalize_callback
+{
+    my ( $p, $func ) = @_;
+
+    my %new;
+
+    foreach my $key ( keys %$p )
+    {
+        my $new_key = $func->( $key );
+
+        unless ( defined $new_key )
+        {
+            die "The normalize_keys callback did not return a defined value";
+        }
+        $new{$new_key} = $p->{ $key };
+    }
+
+    return \%new;
 }
 
 sub _normalize_named
@@ -500,6 +527,7 @@ sub _validate_one_param
 		     on_fail       => sub { require Carp;
                                             Carp::confess($_[0]) },
 		     stack_skip    => 1,
+                     normalize_keys => undef,
 		   );
 
     *set_options = \&validation_options;

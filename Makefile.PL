@@ -32,8 +32,7 @@ EOF
 
 close F or no_cc();
 
-my $make = $^O =~ /win32/i ? 'nmake' : 'make';
-system("$make test$Config{obj_ext}") and no_cc();
+system("$Config{make} test$Config{obj_ext}") and no_cc();
 
 if ( -d 'CVS' )
 {
@@ -42,6 +41,8 @@ if ( -d 'CVS' )
 
     foreach my $file ( grep { /^\d.+\.t$/ } readdir DIR )
     {
+        next if $file eq '99-pod.t';
+
         my $real_file = File::Spec->catfile( 't', $file );
 
         local *F;
@@ -77,9 +78,12 @@ EOF
 
     my $zz = join ' ', glob File::Spec->catfile( 't', 'zz_*.t' );
 
+    my %prereq = ( 'Test::More' => 0 );
+    $prereq{'Attribute::Handlers'} = 0 if $] >= 5.006;
+
     WriteMakefile( VERSION_FROM    => "lib/Params/Validate.pm",
                    NAME            => "Params::Validate",
-                   PREREQ_PM       => $] >= 5.006 ? { 'Attribute::Handlers' => 0 } : {},
+                   PREREQ_PM       => \%prereq,
                    CONFIGURE       => \&init,
                    clean           => { FILES => "test.c test.o $zz" },
                    ( $] >= 5.005 ?
