@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 use strict;
 
 use lib './t';
@@ -133,6 +135,11 @@ use vars qw(@expect);
 
            0,
            q|^Parameter #1 to .* was a 'scalar'.*|,
+           0,
+
+           q|^Odd number|,
+
+           # optional glob
            0,
 	  );
 

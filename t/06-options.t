@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 use strict;
 
 BEGIN
@@ -14,7 +16,7 @@ Params::Validate::validation_options( stack_skip => 2 );
 
 sub foo
 {
-    validate(@_, { bar => 1 });
+    my %p = validate(@_, { bar => 1 });
 }
 
 sub bar { foo(@_) }
@@ -35,11 +37,13 @@ ok( $@ =~ /mandatory.*missing.*call to main::baz/i );
 
 unless ( $] == 5.006 )
 {
-    Params::Validate::validation_options( on_fail => sub { die { hash => 'ref' } } );
+    Params::Validate::validation_options
+        ( on_fail => sub { die bless { hash => 'ref' }, 'Dead' } );
 
     eval { baz() };
 
     ok( $@ );
-    ok( ref $@ eq 'HASH' );
     ok( $@->{hash} eq 'ref' );
+    ok( UNIVERSAL::isa( $@, 'Dead' ) );
 }
+
