@@ -16,6 +16,7 @@ BEGIN
     sub OBJECT    () { 512 }
 
     sub HANDLE    () { 16 | 32 }
+    sub BOOLEAN   () { 1 | 256 }
 }
 
 require Exporter;
@@ -23,7 +24,7 @@ require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %OPTIONS $called $options);
 @ISA = qw(Exporter);
 
-my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE UNDEF OBJECT ) ],
+my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF OBJECT ) ],
 	   );
 
 %EXPORT_TAGS = ( 'all' => [ qw( validate validate_pos validation_options ), map { @{ $tags{$_} } } keys %tags ],
@@ -32,7 +33,7 @@ my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARR
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 # Matt Sergeant came up with this prototype, which slickly takes the
 # first array (which should be the caller's @_), and makes it a
@@ -104,13 +105,14 @@ sub validate_pos (\@@)
 sub validate (\@$)
 {
     my $p = shift;
-    my $specs = shift;
+    my %specs = %{ shift() };
 
-    if ( ref $p->[0] && UNIVERSAL::isa( $p->[0], 'HASH' ) )
+    my %p;
+    if ( UNIVERSAL::isa( $p->[0], 'HASH' ) )
     {
 	# Make a copy so we don't alter the hash reference for the
 	# caller.
-	$p = { %{ $p->[0] } };
+	%p = %{ $p->[0] };
     }
     else
     {
@@ -120,20 +122,20 @@ sub validate (\@$)
 	# This is to hashify the list.  Also has the side effect of
 	# copying the values so we can play with it however we want
 	# without actually changing @_.
-	$p = {@$p};
+	%p = @$p;
     }
 
     if ( $ENV{PERL_NO_VALIDATION} )
     {
-	while ( my ($key, $spec) = each %$specs )
+	while ( my ($key, $spec) = each %specs )
 	{
-	    if ( ! exists $p->{$key} && ref $spec && exists $spec->{default} )
+	    if ( ! exists $p{$key} && ref $spec && exists $spec->{default} )
 	    {
-		$p->{$key} = $spec->{default};
+		$p{$key} = $spec->{default};
 	    }
 	}
 
-	return %$p;
+	return %p;
     }
 
     local $called = (caller(1))[3];
@@ -141,13 +143,13 @@ sub validate (\@$)
 
     if ( $options->{ignore_case} || $options->{strip_leading} )
     {
-	$specs = _normalize_named($specs);
-	$p = _normalize_named($p);
+	%specs = _normalize_named(%specs);
+	%p = _normalize_named(%p);
     }
 
     unless ( $options->{allow_extra} )
     {
-	if ( my @unmentioned = grep { ! exists $specs->{$_} } keys %$p )
+	if ( my @unmentioned = grep { ! exists $specs{$_} } keys %p )
 	{
 	    $options->{on_fail}->( "The following parameter" . (@unmentioned > 1 ? 's were' : ' was') .
 				   " passed in the call to $called but " .
@@ -157,10 +159,28 @@ sub validate (\@$)
     }
 
     my @missing;
-    foreach (keys %$specs)
+    while ( my ( $key, $spec ) = each %specs )
     {
-	next if exists $p->{$_};
-	push @missing, $_ unless _is_optional($specs->{$_});
+	unless ( exists $p{$key} )
+	{
+	    unless ( _is_optional($spec) )
+	    {
+		push @missing, $key;
+		next;
+	    }
+	}
+
+	# Can't validate a non hashref spec beyond presence/absence of the parameter.
+	next unless ref $spec;
+
+	if ( exists $p{$key} )
+	{
+	    _validate_one_param( $p{$key}, $spec, "The '$key' parameter" );
+	}
+	else
+	{
+	    $p{$key} = $spec->{default} if exists $spec->{default};
+	}
     }
 
     if (@missing)
@@ -169,22 +189,7 @@ sub validate (\@$)
 	$options->{on_fail}->( "Mandatory parameter" . (@missing > 1 ? 's': '') . " $missing missing in call to $called\n" );
     }
 
-    foreach (keys %$specs)
-    {
-	_validate_one_param( $p->{$_}, $specs->{$_}, "The '$_' parameter" )
-	    if ref $specs->{$_} && exists $p->{$_};
-    }
-
-    return unless wantarray;
-
-    # Add defaults to existing parameters if called in list context
-    while (my ($key, $spec) = each %$specs)
-    {
-	next if exists $p->{$key} || ! exists $spec->{default};
-
-	$p->{$key} = $spec->{default};
-    }
-    return %$p;
+    return %p if wantarray;
 }
 
 sub _is_optional
@@ -194,61 +199,56 @@ sub _is_optional
     # foo => 1  used to mark mandatory argument with no other validation
     return ! $spec unless ref $spec;
 
-    return $spec->{optional} if exists $spec->{optional};
-
     # If it has a default it has to be optional
-    return exists $spec->{default};
+    return exists $spec->{optional} ? $spec->{optional} : exists $spec->{default};
 }
 
 sub _normalize_named
 {
-    my $h = shift;
-
-    # we really don't want to mess with the original
-    my %copy = %$h;
+    my %h = @_;
 
     if ( $options->{ignore_case} )
     {
-	foreach (keys %copy)
+	foreach (keys %h)
 	{
-	    $copy{ lc $_ } = delete $copy{$_};
+	    $h{ lc $_ } = delete $h{$_};
 	}
     }
 
     if ( $options->{strip_leading} )
     {
-	foreach my $key (keys %copy)
+	foreach my $key (keys %h)
 	{
 	    my $new;
 	    ($new = $key) =~ s/^$options->{strip_leading}//;
-	    $copy{$new} = delete $copy{$key};
+	    $h{$new} = delete $h{$key};
 	}
     }
 
-    return \%copy;
+    return %h;
 }
 
 sub _validate_one_param
 {
     my $value = shift;
-    my $spec = shift;
+    my %spec = %{ shift() };
     my $id = shift;
 
-    if ( exists $spec->{type} )
+    if ( exists $spec{type} )
     {
 	my $type = _get_type($value);
-	unless ( $type & $spec->{type} )
+	unless ( $type & $spec{type} )
 	{
 	    my @is = _typemask_to_strings($type);
-	    my @allowed = _typemask_to_strings($spec->{type});
+	    my @allowed = _typemask_to_strings($spec{type});
 	    my $article = $is[0] =~ /^[aeiou]/i ? 'an' : 'a';
 	    $options->{on_fail}->( "$id to $called was $article '@is', which is not one of the allowed types: @allowed\n" );
 	}
     }
 
-    if ( exists $spec->{isa} )
+    if ( exists $spec{isa} )
     {
-	foreach ( ref $spec->{isa} ? @{ $spec->{isa} } : $spec->{isa} )
+	foreach ( ref $spec{isa} ? @{ $spec{isa} } : $spec{isa} )
 	{
 	    unless ( UNIVERSAL::isa( $value, $_ ) )
 	    {
@@ -260,26 +260,27 @@ sub _validate_one_param
 	}
     }
 
-    if ( exists $spec->{can} )
+    if ( exists $spec{can} )
     {
-	foreach ( ref $spec->{can} ? @{ $spec->{can} } : $spec->{can} )
+	foreach ( ref $spec{can} ? @{ $spec{can} } : $spec{can} )
 	{
-	    $options->{on_fail}->( "$id to $called does not have the method: '$_'\n" ) unless UNIVERSAL::can( $value, $_ );
+	    $options->{on_fail}->( "$id to $called does not have the method: '$_'\n" )
+		unless UNIVERSAL::can( $value, $_ );
 	}
     }
 
-    if ($spec->{callbacks})
+    if ( $spec{callbacks} )
     {
 	$options->{on_fail}->( "'callbacks' validation parameter for $called must be a hash reference\n" )
-	    unless UNIVERSAL::isa( $spec->{callbacks}, 'HASH' );
+	    unless UNIVERSAL::isa( $spec{callbacks}, 'HASH' );
 
-	foreach ( keys %{ $spec->{callbacks} } )
+	foreach ( keys %{ $spec{callbacks} } )
 	{
 	    $options->{on_fail}->( "callback '$_' for $called is not a subroutine reference\n" )
-		unless UNIVERSAL::isa( $spec->{callbacks}{$_}, 'CODE' );
+		unless UNIVERSAL::isa( $spec{callbacks}{$_}, 'CODE' );
 
 	    $options->{on_fail}->( "$id to $called did not pass the '$_' callback\n" )
-		unless $spec->{callbacks}{$_}->($value);
+		unless $spec{callbacks}{$_}->($value);
 	}
     }
 }
@@ -293,6 +294,7 @@ sub _validate_one_param
 		 'GLOB'   => GLOBREF,
 		 'SCALAR' => SCALARREF,
 	       );
+    my %simple_refs = map { $_ => 1 } keys %isas;
 
     sub _get_type
     {
@@ -300,22 +302,24 @@ sub _validate_one_param
 
 	return UNDEF unless defined $value;
 
-	unless (ref $value)
+	my $ref = ref $value;
+	unless ($ref)
 	{
 	    # catches things like:  my $fh = do { local *FH; };
 	    return GLOB if UNIVERSAL::isa( \$value, 'GLOB' );
 	    return SCALAR;
 	}
 
-	my $or = 0;
-	if ( ! grep { ref $value eq $_ } keys %isas )
+	if ( $simple_refs{$ref} )
 	{
-	    $or = OBJECT;
+	    return $isas{$ref};
 	}
-
-	foreach ( keys %isas )
+	else
 	{
-	    return $isas{$_} | $or if UNIVERSAL::isa( $value, $_ );
+	    foreach ( keys %isas )
+	    {
+		return $isas{$_} | OBJECT if UNIVERSAL::isa( $value, $_ );
+	    }
 	}
 
 	# I really hope this never happens.
@@ -464,8 +468,8 @@ functions.
 In addition, it can export the following constants, which are used as
 part of the type checking.  These are C<SCALAR>, C<ARRAYREF>,
 C<HASHREF>, C<CODEREF>, C<GLOB>, C<GLOBREF>, and C<SCALARREF>,
-C<UNDEF>, C<OBJECT>, and C<HANDLE>.  These are explained in the
-section on L<Type Validation|Params::Validate/Type Validation>.
+C<UNDEF>, C<OBJECT>, C<BOOLEAN>, and C<HANDLE>.  These are explained
+in the section on L<Type Validation|Params::Validate/Type Validation>.
 
 The constants are available via the export tag C<:types>.  There is
 also an C<:all> tag which includes all of the constants as well as the
@@ -588,12 +592,16 @@ An undefined value
 
 A blessed reference.
 
+=item * BOOLEAN
+
+This is a special option, and is just a shortcut for C<UNDEF | SCALAR>.
+
 =item * HANDLE
 
-This option is special, in that it is just a shortcut for C<GLOB |
+This option is also special, and is just a shortcut for C<GLOB |
 GLOBREF>.  However, it seems likely that most people interested in
 either globs or glob references are likely to really be interested in
-whether what is being in is a potentially valid file or directory
+whether the parameter in questoin could be a valid file or directory
 handle.
 
 =back

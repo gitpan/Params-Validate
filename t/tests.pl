@@ -2,7 +2,7 @@ use strict;
 
 use Params::Validate qw(:all);
 
-print "1..77\n";
+print "1..79\n";
 
 sub run_tests
 {
@@ -114,6 +114,13 @@ sub run_tests
 	check();
 
 	eval { sub4a( foo => ['not a handle'] ) };
+	check();
+
+	# test BOOLEAN type
+	eval { sub4b( foo => undef ) };
+	check();
+
+	eval { sub4b( foo => 124125 ) };
 	check();
     }
 
@@ -260,11 +267,11 @@ sub run_tests
 	check();
     }
 
-    # set_options
+    # validation_options
     {
 	{
 	    package Foo;
-	    Params::Validate::set_options( ignore_case => 1 );
+	    Params::Validate::validation_options( ignore_case => 1 );
 	}
 	eval { Foo::sub18( FOO => 1 ) };
 	check();
@@ -375,6 +382,11 @@ sub sub4
 sub sub4a
 {
     validate( @_, { foo => { type => HANDLE } } );
+}
+
+sub sub4b
+{
+    validate( @_, { foo => { type => BOOLEAN } } );
 }
 
 sub sub5
