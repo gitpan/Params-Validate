@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2003 Dave Rolsky
+# Copyright (c) 2000-2004 Dave Rolsky
 # All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.  See the LICENSE
@@ -15,7 +15,7 @@ BEGIN
 
     @ISA = 'Exporter';
 
-    $VERSION = '0.72';
+    $VERSION = '0.73';
 
     my %tags =
         ( types =>
@@ -108,7 +108,7 @@ Params::Validate - Validate method/function parameters
 
   sub pos_with_defaults
   {
-       my @p = validate( @_, 1, { default => 99 } );
+       my @p = validate_pos( @_, 1, { default => 99 } );
   }
 
   sub sets_options_on_call
@@ -373,6 +373,26 @@ reference, such as:
            { foo =>
              callbacks =>
              { 'bigger than baz' => sub { $_[0] > $_[1]->{baz} } } } );
+
+=head2 Untainting
+
+If you want values untainted, set the "untaint" key in a spec hashref
+to a true value, like this:
+
+ my %p =
+   validate( @_, { foo =>
+                   { type => SCALAR, untaint => 1 },
+                   bar =>
+                   { type => ARRAYREF } } );
+
+This will untaint the "foo" parameter if the parameters are valid.
+
+Note that untainting is only done if I<all parameters> are valid.
+Also, only the return values are untainted, not the original values
+passed into the validation function.
+
+Asking for untainting of a reference value will not do anything, as
+C<Params::Validate> will only attempt to untaint the reference itself.
 
 =head2 Mandatory/Optional Revisited
 
@@ -694,5 +714,11 @@ executing actual program code.
 =head1 AUTHORS
 
 Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 David Rolsky.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
 =cut
