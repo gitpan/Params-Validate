@@ -49,9 +49,9 @@ AR_STATIC_ARGS = cr
 NAME = Params::Validate
 DISTNAME = Params-Validate
 NAME_SYM = Params_Validate
-VERSION = 0.20
-VERSION_SYM = 0_20
-XS_VERSION = 0.20
+VERSION = 0.21
+VERSION_SYM = 0_21
+XS_VERSION = 0.21
 INST_ARCHLIB = blib/arch
 INST_SCRIPT = blib/script
 INST_BIN = blib/bin
@@ -667,7 +667,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@$(PERL) -e "print qq{<SOFTPKG NAME=\"$(DISTNAME)\" VERSION=\"0,20,0,0\">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>Validate method/function parameters</ABSTRACT>\n\t<AUTHOR>Dave Rolsky, &lt;autarch\@urth.org&gt;</AUTHOR>\n}" > $(DISTNAME).ppd
+	@$(PERL) -e "print qq{<SOFTPKG NAME=\"$(DISTNAME)\" VERSION=\"0,21,0,0\">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>Validate method/function parameters</ABSTRACT>\n\t<AUTHOR>Dave Rolsky, &lt;autarch\@urth.org&gt;</AUTHOR>\n}" > $(DISTNAME).ppd
 	@$(PERL) -e "print qq{\t<IMPLEMENTATION>\n\t\t<DEPENDENCY NAME=\"Attribute-Handlers\" VERSION=\"0,0,0,0\" />\n}" >> $(DISTNAME).ppd
 	@$(PERL) -e "print qq{\t\t<OS NAME=\"$(OSNAME)\" />\n\t\t<ARCHITECTURE NAME=\"i386-linux\" />\n\t\t<CODEBASE HREF=\"\" />\n\t</IMPLEMENTATION>\n</SOFTPKG>\n}" >> $(DISTNAME).ppd
 

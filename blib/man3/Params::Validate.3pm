@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "Params::Validate 3"
-.TH Params::Validate 3 "2002-07-13" "perl v5.6.1" "User Contributed Perl Documentation"
+.TH Params::Validate 3 "2002-07-14" "perl v5.6.1" "User Contributed Perl Documentation"
 .SH "NAME"
 Params::Validate \- Validate method/function parameters
 .SH "SYNOPSIS"
@@ -267,7 +267,7 @@ subroutine like this:
 \&               } );
 .Ve
 .PP
-Subroutines expected positional parameters should call the
+Subroutines expecting positional parameters should call the
 \&\f(CW\*(C`validate_pos\*(C'\fR subroutine like this:
 .PP
 .Vb 1
@@ -504,6 +504,9 @@ Simple examples of defaults would be:
 .Vb 1
 \& my @p = validate( @_, 1, { default => 99 } );
 .Ve
+.PP
+In scalar context, a hash reference or array reference will be
+returned, as appropriate.
 .SH "USAGE NOTES"
 .IX Header "USAGE NOTES"
 .Sh "Validation failure"
@@ -570,6 +573,9 @@ module must include a call to \f(CB\*(C`Params::Validate::validation_options\*(C
 This is only relevant when dealing with named parameters.  If it is
 true, then the validation code will ignore the case of parameter
 names.  Defaults to false.
+.Sp
+When this is turned on, we have to copy more data around internally,
+leading to a potential speed impact.
 .ie n .IP "\(bu strip_leading => $characters" 4
 .el .IP "\(bu strip_leading => \f(CW$characters\fR" 4
 .IX Item "strip_leading => $characters"
@@ -578,6 +584,9 @@ is given then any parameters starting with these characters will be
 considered equivalent to parameters without them entirely.  For
 example, if this is specified as '\-', then \f(CW\*(C`\-foo\*(C'\fR and \f(CW\*(C`foo\*(C'\fR would be
 considered identical.
+.Sp
+When this is turned on, we have to copy more data around internally,
+leading to a potential speed impact.
 .ie n .IP "\(bu allow_extra => $boolean" 4
 .el .IP "\(bu allow_extra => \f(CW$boolean\fR" 4
 .IX Item "allow_extra => $boolean"

@@ -42,7 +42,36 @@ my %tags =
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.20';
+$VERSION = '0.21';
+
+=pod
+
+=begin internals
+
+Various internals notes (for me and any future readers of this
+monstrosity):
+
+- A lot of the weirdness is _intentional_, because it optimizes for
+  the _success_ case.  It does not really matter how slow the code is
+  after it enters a path that leads to reporting failure.  But the
+  "success" path should be as fast as possible.
+
+-- We only calculate $called as needed for this reason, even though it
+   means copying code all over.
+
+- All the validation routines need to be careful never to alter the
+  references that are passed.
+
+-- The code assumes that _most_ callers will not be using the
+   skip_leading or ignore_case features.  In order to not alter the
+   references passed in, we copy them wholesale when normalize them to
+   make these features work.  This is slower but lets us be faster
+   when not using them.
+
+=end
+
+=cut
+
 
 # Matt Sergeant came up with this prototype, which slickly takes the
 # first array (which should be the caller's @_), and makes it a
@@ -58,6 +87,8 @@ sub validate_pos (\@@)
     my @p = @$p;
     if ( NO_VALIDATE )
     {
+        # if the spec is bigger that's where we can start adding
+        # defaults
         for ( my $x = $#p + 1; $x <= $#specs; $x++ )
 	{
             $p[$x] =
@@ -65,7 +96,7 @@ sub validate_pos (\@@)
                     if ref $specs[$x] && exists $specs[$x]->{default};
 	}
 
-	return @p;
+	return wantarray ? @p : \@p;
     }
 
     # I'm too lazy to pass these around all over the place.
@@ -96,11 +127,7 @@ sub validate_pos (\@@)
 	my $val = $options->{allow_extra} ? $min : $max;
 	$minmax .= $val != 1 ? ' were' : ' was';
 
-        my $called =
-            ( exists $options->{called} ?
-              $options->{called} :
-              (caller( $options->{stack_skip} + 1 ))[3]
-            );
+        my $called = _get_called();
 
 	$options->{on_fail}->
             ( "$actual parameter" .
@@ -114,18 +141,18 @@ sub validate_pos (\@@)
     foreach ( 0..$bigger )
     {
 	my $spec = $specs[$_];
-	if ( $_ <= $#p )
-	{
-	    _validate_one_param( $p[$_], $spec, "Parameter #" . ($_ + 1) )
-		if ref $spec;
-	}
 
 	next unless ref $spec;
+
+	if ( $_ <= $#p )
+	{
+	    _validate_one_param( $p[$_], $spec, "Parameter #" . ($_ + 1) );
+	}
 
 	$p[$_] = $spec->{default} if $_ > $#p && exists $spec->{default};
     }
 
-    return @p if wantarray;
+    return wantarray ? @p : \@p;
 }
 
 sub validate (\@$)
@@ -142,22 +169,19 @@ sub validate (\@$)
     {
         if ( ref $p eq 'ARRAY' )
         {
-            if ( @$p == 1 && ref $p->[0] )
+            # we were called as validate( @_, ... ) where @_ has a
+            # single element, a hash reference
+            if ( ref $p->[0] )
             {
                 $p = $p->[0];
             }
             elsif ( @$p % 2 )
             {
-                my $called =
-                    ( exists $options->{called} ?
-                      exists $options->{called} :
-                      (caller( $options->{stack_skip} ))[3]
-                    );
+                my $called = _get_called();
 
                 $options->{on_fail}->
                     ( "Odd number of parameters in call to $called " .
                       "when named parameters were expected\n" );
-
             }
             else
             {
@@ -174,26 +198,48 @@ sub validate (\@$)
 
     if ( NO_VALIDATE )
     {
-        return ( ( map { $_ => $specs->{$_}->{default} }
-                   grep { ref $specs->{$_} && exists $specs->{$_}->{default} }
-                   keys %$specs
-                 ),
-                 ( ref $p eq 'ARRAY' ?
-                   ( ref $p->[0] ?
-                     %{ $p->[0] } :
-                     @$p ) :
-                   %$p
-                 )
-               );
+        return
+            ( wantarray ?
+              (
+               # this is a has containing just the defaults
+               ( map { $_ => $specs->{$_}->{default} }
+                 grep { ref $specs->{$_} && exists $specs->{$_}->{default} }
+                 keys %$specs
+               ),
+               # this recapitulates the login seen above in order to
+               # derefence our parameters properly
+               ( ref $p eq 'ARRAY' ?
+                 ( ref $p->[0] ?
+                   %{ $p->[0] } :
+                   @$p ) :
+                 %$p
+               )
+              ) :
+              do
+              {
+                  my $ref =
+                      ( ref $p eq 'ARRAY' ?
+                        ( ref $p->[0] ?
+                          $p->[0] :
+                          {@$p} ) :
+                        $p
+                      );
+
+                  foreach ( grep { ref $specs->{$_} && exists $specs->{$_}->{default} }
+                            keys %$specs )
+                  {
+                      $ref->{$_} = $specs->{$_}->{default}
+                          unless exists $ref->{$_};
+                  }
+
+                  $ref;
+              }
+            );
     }
 
     unless ( $options->{allow_extra} )
     {
-        my $called =
-            ( exists $options->{called} ?
-              $options->{called} :
-              (caller( $options->{stack_skip} ))[3]
-            );
+        my $called = _get_called();
 
 	if ( my @unmentioned = grep { ! exists $specs->{$_} } keys %$p )
 	{
@@ -214,15 +260,20 @@ sub validate (\@$)
                ! (
                   do
                   {
+                      # we want to short circuit the loop here if we
+                      # can assign a default, because there's no need
+                      # check anything else at all.
                       if ( exists $spec->{default} )
                       {
                           $p->{$key} = $spec->{default};
                           next OUTER;
-                       }
+                      }
                   }
                   ||
                   do
                   {
+                      # Similarly, an optional parameter that is
+                      # missing needs no additional processing.
                       $spec->{optional} && next OUTER
                   }
                  ) :
@@ -231,22 +282,17 @@ sub validate (\@$)
         {
             push @missing, $key;
 	}
-        else
+        # Can't validate a non hashref spec beyond the presence or
+        # absence of the parameter.
+        elsif (ref $spec)
         {
-            # Can't validate a non hashref spec beyond presence/absence of the parameter.
-            next unless ref $spec;
-
 	    _validate_one_param( $p->{$key}, $spec, "The '$key' parameter" );
 	}
     }
 
     if (@missing)
     {
-        my $called =
-            ( exists $options->{called} ?
-              $options->{called} :
-              (caller( $options->{stack_skip} ))[3]
-            );
+        my $called = _get_called();
 
 	my $missing = join ', ', map {"'$_'"} @missing;
 	$options->{on_fail}->
@@ -281,7 +327,9 @@ sub validate_with
     }
     else
     {
-        # intentionally ignore prototype
+        # intentionally ignore the prototype because this contains
+        # either an array or hash reference, and validate() will
+        # handle either one properly
 	return &validate( $p{params}, $p{spec} );
     }
 }
@@ -326,11 +374,7 @@ sub _validate_one_param
 	    my @allowed = _typemask_to_strings($spec->{type});
 	    my $article = $is[0] =~ /^[aeiou]/i ? 'an' : 'a';
 
-            my $called =
-                ( exists $options->{called} ?
-                  exists $options->{called} :
-                  (caller( $options->{stack_skip} + 1 ))[3]
-                );
+            my $called = _get_called(1);
 
 	    $options->{on_fail}->
                 ( "$id to $called was $article '@is', which " .
@@ -351,11 +395,7 @@ sub _validate_one_param
 		my $article1 = $_ =~ /^[aeiou]/i ? 'an' : 'a';
 		my $article2 = $is =~ /^[aeiou]/i ? 'an' : 'a';
 
-                my $called =
-                    ( exists $options->{called} ?
-                      exists $options->{called} :
-                      (caller( $options->{stack_skip} + 1 ))[3]
-                    );
+                my $called = _get_called(1);
 
 		$options->{on_fail}->
                     ( "$id to $called was not $article1 '$_' " .
@@ -370,11 +410,7 @@ sub _validate_one_param
 	{
             unless ( UNIVERSAL::can( $value, $_ ) )
             {
-                my $called =
-                    ( exists $options->{called} ?
-                      exists $options->{called} :
-                      (caller( $options->{stack_skip} + 1 ))[3]
-                    );
+                my $called = _get_called(1);
 
                 $options->{on_fail}->( "$id to $called does not have the method: '$_'\n" );
             }
@@ -385,11 +421,7 @@ sub _validate_one_param
     {
         unless ( UNIVERSAL::isa( $spec->{callbacks}, 'HASH' ) )
         {
-            my $called =
-                ( exists $options->{called} ?
-                  exists $options->{called} :
-                  (caller( $options->{stack_skip} + 1 ))[3]
-                );
+            my $called = _get_called(1);
 
             $options->{on_fail}->
                 ( "'callbacks' validation parameter for $called must be a hash reference\n" );
@@ -400,22 +432,14 @@ sub _validate_one_param
 	{
             unless ( UNIVERSAL::isa( $spec->{callbacks}{$_}, 'CODE' ) )
             {
-                my $called =
-                    ( exists $options->{called} ?
-                      exists $options->{called} :
-                      (caller( $options->{stack_skip} + 1 ))[3]
-                    );
+                my $called = _get_called(1);
 
                 $options->{on_fail}->( "callback '$_' for $called is not a subroutine reference\n" );
             }
 
             unless ( $spec->{callbacks}{$_}->($value) )
             {
-                my $called =
-                    ( exists $options->{called} ?
-                      exists $options->{called} :
-                      (caller( $options->{stack_skip} + 1 ))[3]
-                    );
+                my $called = _get_called(1);
 
                 $options->{on_fail}->( "$id to $called did not pass the '$_' callback\n" );
             }
@@ -530,6 +554,19 @@ sub _validate_one_param
                   \%defaults );
         }
     }
+}
+
+sub _get_called
+{
+    my $extra_skip = $_[0] || 0;
+
+    # always add one more for this sub
+    $extra_skip++;
+
+    return ( exists $options->{called} ?
+             $options->{called} :
+             ( caller( $options->{stack_skip} + $extra_skip ) )[3]
+           );
 }
 
 1;
@@ -659,7 +696,7 @@ subroutine like this:
                  ...
                } );
 
-Subroutines expected positional parameters should call the
+Subroutines expecting positional parameters should call the
 C<validate_pos> subroutine like this:
 
  validate_pos( @_, { validation spec }, { validation spec } );
@@ -879,6 +916,9 @@ Simple examples of defaults would be:
 
  my @p = validate( @_, 1, { default => 99 } );
 
+In scalar context, a hash reference or array reference will be
+returned, as appropriate.
+
 =head1 USAGE NOTES
 
 =head2 Validation failure
@@ -945,6 +985,9 @@ This is only relevant when dealing with named parameters.  If it is
 true, then the validation code will ignore the case of parameter
 names.  Defaults to false.
 
+When this is turned on, we have to copy more data around internally,
+leading to a potential speed impact.
+
 =item * strip_leading => $characters
 
 This too is only relevant when dealing with named parameters.  If this
@@ -952,6 +995,9 @@ is given then any parameters starting with these characters will be
 considered equivalent to parameters without them entirely.  For
 example, if this is specified as '-', then C<-foo> and C<foo> would be
 considered identical.
+
+When this is turned on, we have to copy more data around internally,
+leading to a potential speed impact.
 
 =item * allow_extra => $boolean
 
