@@ -33,7 +33,7 @@ my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARR
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 # Matt Sergeant came up with this prototype, which slickly takes the
 # first array (which should be the caller's @_), and makes it a
@@ -84,7 +84,7 @@ sub validate_pos (\@@)
     foreach ( 0..$bigger )
     {
 	my $spec = $specs[$_];
-	if ( exists $p[$_] )
+	if ( $_ <= $#p )
 	{
 	    _validate_one_param( $p[$_], $spec, "Parameter #" . ($_ + 1) )
 		if ref $spec;
@@ -92,7 +92,7 @@ sub validate_pos (\@@)
 
 	next unless ref $spec;
 
-	$p[$_] = $spec->{default} if ! exists $p[$_] && exists $spec->{default};
+	$p[$_] = $spec->{default} if $_ > $#p && exists $spec->{default};
     }
 
     return @p if wantarray;
@@ -306,16 +306,11 @@ sub _validate_one_param
 	    return SCALAR;
 	}
 
-	if ( $simple_refs{$ref} )
+	return $isas{$ref} if $simple_refs{$ref};
+
+	foreach ( keys %isas )
 	{
-	    return $isas{$ref};
-	}
-	else
-	{
-	    foreach ( keys %isas )
-	    {
-		return $isas{$_} | OBJECT if UNIVERSAL::isa( $value, $_ );
-	    }
+	    return $isas{$_} | OBJECT if UNIVERSAL::isa( $value, $_ );
 	}
 
 	# I really hope this never happens.
