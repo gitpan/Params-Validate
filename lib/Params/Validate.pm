@@ -42,7 +42,7 @@ my %tags =
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.23';
+$VERSION = '0.24';
 
 =pod
 
@@ -232,7 +232,7 @@ sub validate (\@$)
                           unless exists $ref->{$_};
                   }
 
-                  $ref;
+                  return $ref;
               }
             );
     }
