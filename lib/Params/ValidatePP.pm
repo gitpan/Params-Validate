@@ -28,26 +28,6 @@ BEGIN
     eval "sub NO_VALIDATE () { $val }";
 }
 
-require Exporter;
-
-use vars qw( @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %OPTIONS $options );
-@ISA = qw(Exporter);
-
-my %tags =
-    ( types =>
-      [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF
-            SCALARREF HANDLE BOOLEAN UNDEF OBJECT ) ],
-    );
-
-%EXPORT_TAGS =
-    ( 'all' => [ qw( validate validate_pos validation_options validate_with ),
-                 map { @{ $tags{$_} } } keys %tags ],
-      %tags,
-    );
-
-@EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
-@EXPORT = qw( validate validate_pos );
-
 # Various internals notes (for me and any future readers of this
 # monstrosity):
 #
@@ -379,7 +359,8 @@ sub _validate_one_param
     }
 
     # short-circuit for common case
-    return unless $spec->{isa} || $spec->{can} || $spec->{callbacks};
+    return unless ( $spec->{isa} || $spec->{can} ||
+                    $spec->{callbacks} || $spec->{regex} );
 
     if ( exists $spec->{isa} )
     {
@@ -440,6 +421,16 @@ sub _validate_one_param
                 $options->{on_fail}->( "$id to $called did not pass the '$_' callback\n" );
             }
 	}
+    }
+
+    if ( exists $spec->{regex} )
+    {
+        unless ( $value =~ /$spec->{regex}/ )
+        {
+            my $called = _get_called(1);
+
+            $options->{on_fail}->( "$id to $called did not pass regex check\n" );
+        }
     }
 }
 

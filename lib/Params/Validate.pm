@@ -10,11 +10,33 @@ use strict;
 
 BEGIN
 {
-    $Params::Validate::VERSION = '0.51';
+    use Exporter;
+    use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %OPTIONS $options );
 
-    unless ( eval { require Params::ValidateXS } )
+    @ISA = 'Exporter';
+
+    $VERSION = '0.52';
+
+    my %tags =
+        ( types =>
+          [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF
+            SCALARREF HANDLE BOOLEAN UNDEF OBJECT ) ],
+        );
+
+    %EXPORT_TAGS =
+        ( 'all' => [ qw( validate validate_pos validation_options validate_with ),
+                     map { @{ $tags{$_} } } keys %tags ],
+          %tags,
+        );
+
+    @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
+    @EXPORT = qw( validate validate_pos );
+
+    eval { require Params::ValidateXS } unless $ENV{PV_TEST_PERL};
+
+    if ( $@ || $ENV{PV_TEST_PERL} )
     {
-        # suppress a subroutine redefined warnin
+        # suppress a subroutine redefined warning
         undef &Params::Validate::validation_options;
         require Params::ValidatePP;
     }
@@ -62,10 +84,10 @@ Params::Validate - Validate method/function parameters
 
 		  baz =>
 		  { type => SCALAR,   # a scalar ...
+               	    # ... that is a plain integer ...
+                    regex => qr/^\d+$/,
 		    callbacks =>
-		      # ... that is a plain integer ...
-		    { 'numbers only' => sub { shift() =~ /^\d+$/ },
-		      # ... and smaller than 90
+		    { # ... and smaller than 90
 		      'less than 90' => sub { shift() < 90 },
 		    },
 		  }
@@ -311,6 +333,23 @@ parameter belongs to a class (or child class) or classes, do:
              { isa => [ qw( My::Frobnicator IO::Handle ) ] } } );
  # must be both, not either!
 
+=head2 Regex Validation
+
+If you want to specify that a given parameter must match a specific
+regular expression, this can be done with "regex" spec key.  For
+example:
+
+
+ validate( @_,
+           { foo =>
+             { regex => qr/^\d+$/ } } );
+
+The value of the "regex" key may be either a string or a pre-compiled
+regex created via C<qr>.
+
+The C<Regexp::Common> module on CPAN is an excellent source of regular
+expressions suitable for validating input.
+
 =head2 Callback Validation
 
 If none of the above are enough, it is possible to pass in one or more
@@ -553,7 +592,7 @@ Carp::Assert and Class::Contract - other modules in the general spirit
 of validating that certain things are true before/while/after
 executing actual program code.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
 

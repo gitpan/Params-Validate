@@ -4,6 +4,7 @@ MANIFEST			This list of files
 Makefile.PL
 ppport.h
 README
+TODO
 Validate.xs
 lib/Attribute/Params/Validate.pm
 lib/Params/Validate.pm
@@ -17,6 +18,9 @@ t/05-noop_default.t
 t/06-options.t
 t/07-with.t
 t/08-noop_with.t
+t/09-regex.t
+t/10-noop_regex.t
 t/defaults.pl
+t/regex.pl
 t/tests.pl
 t/with.pl

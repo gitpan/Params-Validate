@@ -12,7 +12,7 @@
 
 /* not defined in 5.00503 _or_ ppport.h! */
 #ifndef SvPV_nolen
-#  define SvPV_nolen(sv) SvPV(sv, PL_na)
+#  define SvPV_nolen(sv)          SvPV(sv, PL_na)
 #endif
 #ifndef CopSTASHPV
 #  ifdef USE_ITHREADS
@@ -22,6 +22,10 @@
 #    define CopSTASHPV(c)         (CopSTASH(c) ? HvNAME(CopSTASH(c)) : Nullch)
 #  endif /* USE_ITHREADS */
 #endif /* CopSTASHPV */
+
+#ifndef PERL_MAGIC_qr
+#  define PERL_MAGIC_qr          'r'
+#endif /* PERL_MAGIC_qr */
 
 /* type constants */
 #define SCALAR    1
@@ -520,6 +524,56 @@ validate_one_param(SV* value, HV* spec, SV* id, HV* options)
             validation_failure(buffer, options);
         }
     }
+
+    if(temp = hv_fetch(spec, "regex", 5, 0)) {
+        IV has_regex = 0;
+        IV ok;
+        dSP;
+  
+        SvGETMAGIC(*temp);
+        if(SvPOK(*temp)) {
+          has_regex = 1;
+        } else if(SvROK(*temp)) {
+            SV* svp;
+
+            svp = (SV*)SvRV(*temp);
+
+            if (SvMAGICAL(svp) && mg_find(svp, PERL_MAGIC_qr)) {
+                has_regex = 1;
+            }
+        }
+
+        if(!has_regex) {
+            SV* buffer;
+
+            buffer = sv_2mortal(newSVpv("'regex' validation parameter for '", 0));
+            sv_catsv(buffer, get_called(options));
+            sv_catpv(buffer, " must be a string or qr// regex\n");
+            validation_failure(buffer, options);
+
+            return;
+        }
+
+        PUSHMARK(SP);
+        EXTEND(SP, 2);
+        PUSHs(value);
+        PUSHs(*temp);
+        PUTBACK;
+        perl_call_pv("Params::Validate::_check_regex_from_xs", G_SCALAR);
+        SPAGAIN;
+        ok = POPi;
+        PUTBACK;
+
+        if(!ok) {
+            SV* buffer;
+
+            buffer = sv_2mortal(newSVsv(id));
+            sv_catpv(buffer, " to ");
+            sv_catsv(buffer, get_called(options));
+            sv_catpv(buffer, " did not pass regex check\n");
+            validation_failure(buffer, options);
+        }
+    }
 }
 
 /* appends one hash to another (not deep copy) */
@@ -817,7 +871,7 @@ validate(HV* p, HV* specs, HV* options)
             sv_catpv(buffer, " ");
         }
         for(i = 0; i <= av_len(missing); i ++) {
-            sv_catpvf(buffer, "'\%s'",
+            sv_catpvf(buffer, "'%s'",
                       SvPV_nolen(*av_fetch(missing, i, 0)));
             if(i < av_len(missing)) {
                 sv_catpv(buffer, ", ");
@@ -1012,7 +1066,10 @@ validate_pos(p, ...)
         specs = (AV*) sv_2mortal((SV*) newAV());
         av_extend(specs, items);
         for(i = 1; i < items; i ++) {
-            av_store(specs, i - 1, SvREFCNT_inc(ST(i)));
+            if(!av_store(specs, i - 1, SvREFCNT_inc(ST(i)))) {
+                SvREFCNT_dec(ST(i));
+                croak("Cannot store value in array");
+            }
         }
 
         ret = validate_pos((AV*) SvRV(p), specs, get_options(NULL));
