@@ -1,10 +1,19 @@
+0.70 Nov 23, 2003
+
+- Any validation call that used a callback leaked memory.  This was
+introduced in 0.67, when callbacks started receiving a reference to
+the parameters as a second argument.  Reported by Eugene van der
+Pijll.
+
+
 0.69 Nov 3, 2003
 
 - The key normalization feature introduced in 0.66 leaked one SV*
 every time a parameter _hash_ was run through the XS version of
-validate() or validate_with().  This happened regardless of whether
-normalization was actually being done.  Upgrading is strongly
-recommended!  Reported by Ruslan.
+validate() or validate_with().  This happened if one of
+normalize_keys, allow_extra, or ignore_case was set, or if
+validate_with() was used.  Upgrading is strongly recommended!
+Reported by Ruslan.
 
 
 0.68 Oct 21, 2003
