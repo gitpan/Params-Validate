@@ -33,7 +33,7 @@ my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARR
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 # Matt Sergeant came up with this prototype, which slickly takes the
 # first array (which should be the caller's @_), and makes it a
@@ -103,6 +103,8 @@ sub validate (\@$)
     my $p = shift;
     my %specs = %{ shift() };
 
+    local $options = _get_options( (caller(0))[0] );
+
     my %p;
     if ( UNIVERSAL::isa( $p->[0], 'HASH' ) )
     {
@@ -135,7 +137,6 @@ sub validate (\@$)
     }
 
     local $called = (caller(1))[3];
-    local $options = _get_options( (caller(0))[0] );
 
     if ( $options->{ignore_case} || $options->{strip_leading} )
     {
