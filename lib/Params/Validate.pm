@@ -15,12 +15,12 @@ BEGIN
 
     @ISA = 'Exporter';
 
-    $VERSION = '0.57';
+    $VERSION = '0.58';
 
     my %tags =
         ( types =>
           [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF
-            SCALARREF HANDLE BOOLEAN UNDEF OBJECT ) ],
+                SCALARREF HANDLE BOOLEAN UNDEF OBJECT ) ],
         );
 
     %EXPORT_TAGS =
