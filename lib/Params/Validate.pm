@@ -32,7 +32,7 @@ my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARR
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 # Matt Sergeant came up with this prototype, which slickly takes the
 # first array (which should be the caller's @_), and makes it a
@@ -356,6 +356,7 @@ sub _validate_one_param
 		     on_fail => sub { require Carp;  Carp::confess(shift()) },
 		   );
 
+    *set_options = \&validation_options;
     sub validation_options
     {
 	my %opts = @_;
