@@ -15,7 +15,7 @@ BEGIN
 
     @ISA = 'Exporter';
 
-    $VERSION = '0.61';
+    $VERSION = '0.62';
 
     my %tags =
         ( types =>
@@ -36,8 +36,6 @@ BEGIN
 
     if ( $@ || $ENV{PV_TEST_PERL} )
     {
-        warn $@ if $@;
-
         # suppress a subroutine redefined warning
         undef &Params::Validate::validation_options;
         require Params::ValidatePP;
@@ -322,8 +320,8 @@ probably better to specify what methods you expect an object to
 have rather than what class it should be of (or a child of).  This
 will make your API much more flexible.
 
-With that said, if you want to validate_with that an incoming
-parameter belongs to a class (or child class) or classes, do:
+With that said, if you want to validate that an incoming parameter
+belongs to a class (or child class) or classes, do:
 
  validate( @_,
            { foo =>
@@ -367,11 +365,6 @@ in error messages) and the value is a subroutine reference, such as:
              { 'smaller than a breadbox' => sub { shift() < $breadbox },
                'green or blue' =>
                 sub { $_[0] eq 'green' || $_[0] eq 'blue' } } } );
-
-On a side note, I would highly recommend taking a look at Damian
-Conway's Regexp::Common module, which could greatly simply the
-callbacks you use, as it provides patterns useful for validating all
-sorts of data.
 
 =head2 Mandatory/Optional Revisited
 
