@@ -15,7 +15,7 @@ BEGIN
 
     @ISA = 'Exporter';
 
-    $VERSION = '0.59';
+    $VERSION = '0.60';
 
     my %tags =
         ( types =>
@@ -36,11 +36,14 @@ BEGIN
 
     if ( $@ || $ENV{PV_TEST_PERL} )
     {
+        warn $@ if $@;
+
         # suppress a subroutine redefined warning
         undef &Params::Validate::validation_options;
         require Params::ValidatePP;
     }
 }
+
 
 1;
 
