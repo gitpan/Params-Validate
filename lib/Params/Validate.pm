@@ -33,7 +33,7 @@ my %tags = ( types => [ qw( SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARR
 @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
 @EXPORT = qw( validate validate_pos );
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 # Matt Sergeant came up with this prototype, which slickly takes the
 # first array (which should be the caller's @_), and makes it a
@@ -106,7 +106,7 @@ sub validate (\@$)
     local $options = _get_options( (caller(0))[0] );
 
     my %p;
-    if ( UNIVERSAL::isa( $p->[0], 'HASH' ) )
+    if ( defined $p->[0] && UNIVERSAL::isa( $p->[0], 'HASH' ) )
     {
 	# Make a copy so we don't alter the hash reference for the
 	# caller.

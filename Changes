@@ -1,22 +1,29 @@
-0.15
+0.16 May 11, 2002
+
+- Improve skipping of tests when run with 5.6.0.  Patch by Ken
+Williams.
+
+- Silence an uninit value warning
+
+0.15 Apr 19, 2002
 
 - validate_pos would die stupidly when it received an array with an
 odd number of elements.
 
-0.14
+0.14 Mar 14, 2002
 
 - validate_pos used exists on an array element, which only works with
 5.6.0.  This releaes makes it work 5.00503 again.  Reported by Jon
 Swartz.
 
-0.13
+0.13 Mar 10, 2002
 
 - Apply some of the same optimizations to positional parameters.  The
 speedup here seems to be about 7-8%.
 
 - Fix stupid bug in 04-defaults tests.
 
-0.12
+0.12 Mar 10, 2002
 
 - Add BOOLEAN type (equivalent to UNDEF | SCALAR).  Suggested by Ken
 Williams.
@@ -33,12 +40,12 @@ were checked.  Now, the validation parameters (type, isa, etc.) are
 checked first, so that these errors will show up before missing
 parameters.
 
-0.11
+0.11 Jan 04, 2002
 
 - Accidentally removed the set_options function (in 0.08).  Though
 this will go away in the future it isn't happening quite yet.
 
-0.10
+0.10 Jan 04, 2002
 
 - Apparently making a tarball for CPAN is beyond my limited abilities.
 0.09 was missing a file needed for tests.  Also reported by Blair
@@ -47,12 +54,12 @@ Zajac.
 - When running Makefile.PL you get some warnings that can be ignored.
 Add a message saying you can ignore them.
 
-0.09
+0.09 Jan 04, 2002
 
 - I forgot to put the Makefile.PL in the MANIFEST.  I am dumb.
 Reported by Blair Zajac.
 
-0.08
+0.08 Jan 03, 2002
 
 - Explicitly mention that, by default, Params::Validate uses
 Carp::confess to report a validation failure.  Suggested by Mark
@@ -72,7 +79,7 @@ time they are called.  This is probably a bit slower than the previous
 implementation, which only checked once when the module was loaded.
 If you have a problem with this, let me know.
 
-0.07
+0.07 Sep 23, 2001
 
 - Fix problem with CPAN shell's 'r' command that
 Attribute::Params::Validate was causing with older Perl's.  Reported
@@ -82,13 +89,13 @@ by Rob BloodGood.
 hash/array back from validate or validate_pos.  Partial patch
 submitted by Ken Williams.
 
-0.06
+0.06 Aug 23, 2001
 
 - Require Attribute::Handlers if using Perl 5.6.0+.
 
 - fix doc nits.
 
-0.05
+0.05 Aug 23, 2001
 
 - Added Attribute::Params::Validate - do validation via attributes!
 
@@ -97,11 +104,11 @@ safely and is included in the :all export tag.  set_options is
 deprecated and will be removed in a future release.  Thanks to Jon
 Swartz for the suggestion.
 
-0.04
+0.04 Apr 14, 2001
 
 - tweaks to make the code work under 5.00404
 
-0.03 
+0.03 Mar 17, 2001
 
 - make sure all error messages contain the name of the subroutine that
 was called.
@@ -112,11 +119,11 @@ spec has been improved.
 - use Carp::confess by default when dying with an error.  This
 produces a more useful error message.
 
-0.02  Tue Mar 06 18:30 2001
+0.02 Mar 6, 2001
 
 - fix a bug in the test suite that caused failures in 5.6.0.
 
-0.01  Sun Feb 11 16:10 2001
+0.01 Feb 16, 2001
 
 - Original release
 
