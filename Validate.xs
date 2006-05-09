@@ -10,6 +10,12 @@
 #define NEED_newCONSTSUB
 #include "ppport.h"
 
+#ifdef _MSC_VER
+#define INLINE 
+#else
+#define INLINE inline
+#endif
+
 /* not defined in 5.00503 _or_ ppport.h! */
 #ifndef CopSTASHPV
 #  ifdef USE_ITHREADS
@@ -112,7 +118,6 @@
 static void
 bootinit()
 {
-  char* str;
   HV* stash;
 
   /* define constants */
@@ -131,7 +136,7 @@ bootinit()
   newCONSTSUB(stash, "BOOLEAN", newSViv(BOOLEAN));
 }
 
-inline static bool
+INLINE static bool
 no_validation()
 {
   SV* no_v;
@@ -144,7 +149,7 @@ no_validation()
 }
     
 /* return type string that corresponds to typemask */
-inline static SV*
+INLINE static SV*
 typemask_to_string(IV mask)
 {
   SV* buffer;
@@ -197,7 +202,7 @@ typemask_to_string(IV mask)
 }
 
 /* compute numberic datatype for variable */
-inline static IV
+INLINE static IV
 get_type(SV* sv)
 {
   IV type = 0;
@@ -242,7 +247,7 @@ get_type(SV* sv)
 }
 
 /* get an article for given string */
-inline
+INLINE
 #if (PERL_VERSION >= 6) /* Perl 5.6.0+ */
 static const char*
 #else
@@ -365,23 +370,63 @@ static IV
 validate_isa(SV* value, SV* package, SV* id, HV* options)
 {
   SV* buffer;
+  IV ok = 1;
 
-  /* quick test directly from Perl internals */
-  if (sv_derived_from(value, SvPV_nolen(package))) return 1;
+  if (SvOK(value)) {
+    dSP;
 
-  buffer = sv_2mortal(newSVsv(id));
-  sv_catpv(buffer, " to ");
-  sv_catsv(buffer, get_called(options));
-  sv_catpv(buffer, " was not ");
-  sv_catpv(buffer, article(package));
-  sv_catpv(buffer, " '");
-  sv_catsv(buffer, package);
-  sv_catpv(buffer, "' (it is ");
-  sv_catpv(buffer, article(value));
-  sv_catpv(buffer, " ");
-  sv_catsv(buffer, value);
-  sv_catpv(buffer, ")\n");
-  FAIL(buffer, options);
+    SV* ret;
+    IV count;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(value);
+    PUSHs(package);
+    PUTBACK;
+
+    count = call_method("isa", G_SCALAR);
+
+    if (! count)
+      croak("Calling can did not return a value");
+
+    SPAGAIN;
+    
+    ret = POPs;
+    SvGETMAGIC(ret);
+
+    ok = SvTRUE(ret);
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+  } else {
+    ok = 0;
+  }
+
+  if (! ok) {
+    buffer = sv_2mortal(newSVsv(id));
+    sv_catpv(buffer, " to ");
+    sv_catsv(buffer, get_called(options));
+    sv_catpv(buffer, " was not ");
+    sv_catpv(buffer, article(package));
+    sv_catpv(buffer, " '");
+    sv_catsv(buffer, package);
+    sv_catpv(buffer, "' (it is ");
+    if ( SvOK(value) ) {
+      sv_catpv(buffer, article(value));
+      sv_catpv(buffer, " ");
+      sv_catsv(buffer, value);
+    } else {
+      sv_catpv(buffer, "undef");
+    }
+    sv_catpv(buffer, ")\n");
+    FAIL(buffer, options);
+  }
+
+  return 1;
 }
 
 static IV
