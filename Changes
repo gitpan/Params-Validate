@@ -1,4 +1,12 @@
-0.84 May29, 2006
+0.85 June 7, 2006
+
+- Compiles without warnings under gcc's -Wall. Warnings reported by
+Scott Godin.
+
+- Turned off inlining with HP-UX compiler. RT #19763.
+
+
+0.84 May 29, 2006
 
 - The XS version of the code used Carp::croak to report failures,
 while the Perl version used Carp::confess. The module has always been
@@ -6,7 +14,7 @@ documented as using confess, so now the XS version uses this.
 
 - The new compiler detection code always returned false if you didn't
 have ExtUtils::CBuilder installed.
-
+vv
 
 0.83 May 28, 2006
 
