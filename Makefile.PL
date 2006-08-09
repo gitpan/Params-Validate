@@ -61,15 +61,21 @@ write_makefile();
 
 sub write_makefile
 {
-    my %prereq = ( 'Test::More' => 0 );
+    my %prereq =
+        ( 'Test::More' => 0,
+          'Scalar::Util' => 0,
+        );
     $prereq{'Attribute::Handlers'} = 0 if $] >= 5.006;
 
     my $zz = join ' ', glob File::Spec->catfile( 't', 'zz_*.t' );
+
+    my $ccflags = -d '.svn' ? '-Wall' : '';
 
     WriteMakefile( VERSION_FROM    => "lib/Params/Validate.pm",
                    NAME            => "Params::Validate",
                    PREREQ_PM       => \%prereq,
                    CONFIGURE       => \&init,
+                   CCFLAGS         => $ccflags,
                    clean           => { FILES => "test.c test.o $zz" },
                    ( $] >= 5.005 ?
                      ( ABSTRACT_FROM => 'lib/Params/Validate.pm',
@@ -145,7 +151,18 @@ EOF
 
     close F or return 0;
 
-    system( "$Config{cc} -o test$Config{obj_ext} test.c" ) and return 0;
+    my $cc = $Config{cc};
+    if ( $cc =~ /cl(\.exe)?$/ )
+    {
+        # stupid stupid MSVC compiler hack tacken from version.pm's
+        # Makefile.PL
+        $cc .= ' -c'; # prevent it from calling the linker
+    }
+
+    system( "$cc -o test$Config{obj_ext} test.c" ) and return 0;
+
+    unlink $_
+        for grep { -f } 'test.c', "test$Config{obj_ext}";
 
     return 1;
 }

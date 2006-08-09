@@ -7,30 +7,16 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_eval_pv
+#define NEED_sv_2pv_nolen
 #define NEED_newCONSTSUB
 #include "ppport.h"
 
-#ifdef _MSC_VER
-#  define INLINE 
-#elif __hpux
-#  define INLINE 
+#ifdef __GNUC__
+#define INLINE inline
 #else
-#  define INLINE inline
+#define INLINE 
 #endif
-
-/* not defined in 5.00503 _or_ ppport.h! */
-#ifndef CopSTASHPV
-#  ifdef USE_ITHREADS
-#    define CopSTASHPV(c)         ((c)->cop_stashpv)
-#  else
-#    define CopSTASH(c)           ((c)->cop_stash)
-#    define CopSTASHPV(c)         (CopSTASH(c) ? HvNAME(CopSTASH(c)) : Nullch)
-#  endif /* USE_ITHREADS */
-#endif /* CopSTASHPV */
-
-#ifndef PERL_MAGIC_qr
-#  define PERL_MAGIC_qr          'r'
-#endif /* PERL_MAGIC_qr */
 
 /* type constants */
 #define SCALAR    1
@@ -96,7 +82,7 @@
    check the globals afterwards. */
 
 #if (PERL_VERSION == 6) /* 5.6.0 or 5.6.1 */
-#  define FAIL(message, options)    \
+#define FAIL(message, options)    \
             {                       \
               SV* perl_error;       \
               SV* perl_on_fail;     \
@@ -113,7 +99,7 @@
               return 0;             \
             }
 #else /* any other version*/
-#  define FAIL(message, options)                \
+#define FAIL(message, options)                \
         validation_failure(message, options);
 #endif /* PERL_VERSION */
 
@@ -313,7 +299,7 @@ validation_failure(SV* message, HV* options)
     PUSHMARK(SP);
     XPUSHs(message);
     PUTBACK;
-    perl_call_sv(on_fail, G_DISCARD);
+    call_sv(on_fail, G_DISCARD);
   }
 
   /* by default resort to Carp::confess for error reporting */
@@ -323,7 +309,7 @@ validation_failure(SV* message, HV* options)
     PUSHMARK(SP);
     XPUSHs(message);
     PUTBACK;
-    perl_call_pv("Carp::confess", G_DISCARD);
+    call_pv("Carp::confess", G_DISCARD);
   }
 
   return;
@@ -360,7 +346,7 @@ get_called(HV* options)
     buffer = sv_2mortal(newSVpvf("(caller(%d))[3]", (int) frame));
     SvTAINTED_off(buffer);
 
-    caller = perl_eval_pv(SvPV_nolen(buffer), 1);
+    caller = eval_pv(SvPV_nolen(buffer), 1);
     if (SvTYPE(caller) == SVt_NULL) {
       sv_setpv(caller, "N/A");
     }
@@ -394,7 +380,7 @@ validate_isa(SV* value, SV* package, SV* id, HV* options)
     count = call_method("isa", G_SCALAR);
 
     if (! count)
-      croak("Calling can did not return a value");
+      croak("Calling isa did not return a value");
 
     SPAGAIN;
     
@@ -498,6 +484,24 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
   if ((temp = hv_fetch(spec, "type", 4, 0))) {
     IV type;
 
+    if ( ! ( looks_like_number(*temp)
+             && SvIV(*temp) > 0 ) ) {
+      SV* buffer;
+
+      buffer = sv_2mortal(newSVsv(id));
+      sv_catpv( buffer, " has a type specification which is not a number. It is ");
+      if ( SvOK(*temp) ) {
+        sv_catpv( buffer, "a string - " );
+        sv_catsv( buffer, *temp );
+      }
+      else {
+        sv_catpv( buffer, "undef");
+      }
+      sv_catpv( buffer, ".\n Use the constants exported by Params::Validate to declare types." );
+
+      FAIL(buffer, options);
+    }
+
     SvGETMAGIC(*temp);
     type = get_type(value);
     if (! (type & SvIV(*temp))) {
@@ -587,7 +591,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
           PUSHs(sv_2mortal(newRV_inc(params)));
           PUTBACK;
 
-          count = perl_call_sv(SvRV(HeVAL(he)), G_SCALAR);
+          count = call_sv(SvRV(HeVAL(he)), G_SCALAR);
 
           SPAGAIN;
 
@@ -667,7 +671,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
     PUSHs(value);
     PUSHs(*temp);
     PUTBACK;
-    perl_call_pv("Params::Validate::_check_regex_from_xs", G_SCALAR);
+    call_pv("Params::Validate::_check_regex_from_xs", G_SCALAR);
     SPAGAIN;
     ok = POPi;
     PUTBACK;
@@ -762,7 +766,7 @@ get_options(HV* options)
   }
 #endif
   /* get package specific options */
-  OPTIONS = perl_get_hv("Params::Validate::OPTIONS", 1);
+  OPTIONS = get_hv("Params::Validate::OPTIONS", 1);
   if ((temp = hv_fetch(OPTIONS, pkg, strlen(pkg), 0))) {
     SvGETMAGIC(*temp);
     if (SvROK(*temp) && SvTYPE(SvRV(*temp)) == SVt_PVHV) {
@@ -800,7 +804,7 @@ normalize_one_key(SV* key, SV* normalize_func, SV* strip_leading, IV ignore_case
     PUSHMARK(SP);
     XPUSHs(copy);
     PUTBACK;
-    if (! perl_call_sv(SvRV(normalize_func), G_SCALAR)) {
+    if (! call_sv(SvRV(normalize_func), G_SCALAR)) {
       croak("The normalize_keys callback did not return anything");
     }
     SPAGAIN;
