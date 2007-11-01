@@ -488,7 +488,8 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
   if ((temp = hv_fetch(spec, "type", 4, 0))) {
     IV type;
 
-    if ( ! ( looks_like_number(*temp)
+    if ( ! ( SvOK(*temp)
+             && looks_like_number(*temp)
              && SvIV(*temp) > 0 ) ) {
       SV* buffer;
 
@@ -699,9 +700,9 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
   return 1;
 }
 
-/* appends one hash to another (not deep copy) */
+/* merges one hash into another (not deep copy) */
 static void
-append_hash2hash(HV* in, HV* out)
+merge_hashes(HV* in, HV* out)
 {
   HE* he;
 
@@ -784,14 +785,14 @@ get_options(HV* options)
     SvGETMAGIC(*temp);
     if (SvROK(*temp) && SvTYPE(SvRV(*temp)) == SVt_PVHV) {
       if (options) {
-        append_hash2hash((HV*) SvRV(*temp), ret);
+        merge_hashes((HV*) SvRV(*temp), ret);
       } else {
         return (HV*) SvRV(*temp);
       }
     }
   }
   if (options) {
-    append_hash2hash(options, ret);
+    merge_hashes(options, ret);
   }
 
   return ret;

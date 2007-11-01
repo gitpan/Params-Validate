@@ -1,14 +1,13 @@
-# Copyright (c) 2000-2004 Dave Rolsky
-# All rights reserved.
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.  See the LICENSE
-# file that comes with this distribution for more details.
-
 package Params::Validate;
 
 use strict;
+use warnings;
 
 use Scalar::Util ();
+
+# suppress subroutine redefined warnings if we tried to load the XS
+# version and failed.
+no warnings 'redefine';
 
 
 BEGIN
@@ -213,28 +212,25 @@ sub validate (\@$)
     my $specs = $_[1];
     local $options = _get_options( (caller(0))[0] ) unless defined $options;
 
-    unless ( $NO_VALIDATION )
+    if ( ref $p eq 'ARRAY' )
     {
-        if ( ref $p eq 'ARRAY' )
+        # we were called as validate( @_, ... ) where @_ has a
+        # single element, a hash reference
+        if ( ref $p->[0] )
         {
-            # we were called as validate( @_, ... ) where @_ has a
-            # single element, a hash reference
-            if ( ref $p->[0] )
-            {
-                $p = $p->[0];
-            }
-            elsif ( @$p % 2 )
-            {
-                my $called = _get_called();
+            $p = $p->[0];
+        }
+        elsif ( @$p % 2 )
+        {
+            my $called = _get_called();
 
-                $options->{on_fail}->
-                    ( "Odd number of parameters in call to $called " .
-                      "when named parameters were expected\n" );
-            }
-            else
-            {
-                $p = {@$p};
-            }
+            $options->{on_fail}->
+                ( "Odd number of parameters in call to $called " .
+                  "when named parameters were expected\n" );
+        }
+        else
+        {
+            $p = {@$p};
         }
     }
 
@@ -431,7 +427,7 @@ sub _normalize_callback
 sub _normalize_named
 {
     # intentional copy so we don't destroy original
-    my %h = %{ $_[0] };
+    my %h = ( ref $_[0] ) =~ /ARRAY/ ? @{ $_[0] } : %{ $_[0] };
 
     if ( $options->{ignore_case} )
     {
@@ -715,8 +711,8 @@ Params::Validate documentation for details.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 David Rolsky.  All rights reserved.  This program
-is free software; you can redistribute it and/or modify it under the
-same terms as Perl itself.
+Copyright (c) 2004-2007 David Rolsky.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

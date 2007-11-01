@@ -1,7 +1,9 @@
 # The perl/C checking voodoo is stolen from Graham Barr's
 # Scalar-List-Utils distribution.
+use 5.006;
 
 use strict;
+use warnings;
 
 use ExtUtils::MakeMaker;
 use Config qw(%Config);
@@ -33,7 +35,7 @@ unless (defined $no_xs)
 
         foreach my $file ( grep { /^\d.+\.t$/ } readdir DIR )
         {
-            next if $file eq '99-pod.t';
+            next if $file =~ /^99/;
 
             my $real_file = File::Spec->catfile( 't', $file );
 
@@ -71,17 +73,15 @@ sub write_makefile
 
     my $ccflags = -d '.svn' ? '-Wall' : '';
 
-    WriteMakefile( VERSION_FROM    => "lib/Params/Validate.pm",
-                   NAME            => "Params::Validate",
-                   PREREQ_PM       => \%prereq,
-                   CONFIGURE       => \&init,
-                   CCFLAGS         => $ccflags,
-                   clean           => { FILES => "test.c test.o $zz" },
-                   ( $] >= 5.005 ?
-                     ( ABSTRACT_FROM => 'lib/Params/Validate.pm',
-                       AUTHOR        => 'Dave Rolsky, <autarch@urth.org>') :
-                     ()
-                   ),
+    WriteMakefile( VERSION_FROM  => "lib/Params/Validate.pm",
+                   NAME          => "Params::Validate",
+                   PREREQ_PM     => \%prereq,
+                   CONFIGURE     => \&init,
+                   CCFLAGS       => $ccflags,
+                   clean         => { FILES => "test.c test.o $zz" },
+                   ABSTRACT_FROM => 'lib/Params/Validate.pm',
+                   AUTHOR        => 'Dave Rolsky, <autarch@urth.org>',
+                   LICENSE       => 'perl',
                  );
 }
 

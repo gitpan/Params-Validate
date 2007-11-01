@@ -1,8 +1,30 @@
+0.89 October 31, 2007
+
+- With validation turned off, the pure Perl version incorrectly
+  ignored an odd number of parameters when a hash was expected (no
+  validation still does the bare minimum of checks needed to set
+  defaults).
+
+- Added pod & pod coverage tests.
+
+- Modernized test suite to use Test::More and fixed some test suite
+  bugs along the way.
+
+- Attribute::Params::Validate would die when given a ValidatePos
+  attribute containing one element.
+
+- More tests are skipped on 5.6.0.
+
+
 0.88 March 7, 2007
 
 - The XS version threw an error when it attempted to do "isa" or "can"
   validation on a value that was not a string or object, such as undef
   or a number. Reported by Steffen Winkler. RT #25229.
+
+- Fixed a compilation failure with bleadperl (5.9.x) that happened
+  because of a new scalar type introduced in blead. Patch by Nicholas
+  Clark. Fixes RT #24458.
 
 
 0.87 January 18, 2007
@@ -304,7 +326,7 @@
 
 0.56 Feb 24, 2003
 
-- The XS code that handled callbacks expects all callbacks to return
+- The XS code that handled callbacks expected all callbacks to return
   an integer, instead of simply testing the returned value for truth.
   This could cause strange warnings like 'Argument "InMemory" isn't
   numeric in subroutine entry...'. Based on a bug report from Robert
