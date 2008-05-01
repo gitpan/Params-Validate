@@ -34,6 +34,8 @@ t/24-tied.t
 t/25-undef-regex.t
 t/26-isa.t
 t/27-string-as-type.t
+t/28-readonly-return.t
+t/kwalitee.t
 t/lib/PVTests.pm
 t/lib/PVTests/Callbacks.pm
 t/lib/PVTests/Defaults.pm

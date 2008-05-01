@@ -36,6 +36,7 @@
 /* return data macros */
 #define RETURN_ARRAY(ret) \
     STMT_START {                                        \
+        I32 i;                                          \
         switch(GIMME_V) {                               \
           case G_VOID:                                  \
               return;                                   \
@@ -196,21 +197,31 @@ get_type(SV* sv)
 {
   IV type = 0;
 
-  if (SvTYPE(sv) == SVt_PVGV) return GLOB;
-  if (!SvOK(sv)) return UNDEF;
-  if (!SvROK(sv)) return SCALAR;
+  if (SvTYPE(sv) == SVt_PVGV) {
+    return GLOB;
+  }
+  if (!SvOK(sv)) {
+    return UNDEF;
+  }
+  if (!SvROK(sv)) {
+    return SCALAR;
+  }
 
   switch (SvTYPE(SvRV(sv))) {
     case SVt_NULL:
     case SVt_IV:
     case SVt_NV:
     case SVt_PV:
+#if PERL_VERSION <= 10
     case SVt_RV:
+#endif
     case SVt_PVMG:
     case SVt_PVIV:
     case SVt_PVNV:
 #if PERL_VERSION <= 8
     case SVt_PVBM:
+#elif PERL_VERSION >= 11
+    case SVt_REGEXP:
 #endif
       type = SCALARREF;
       break;
@@ -226,6 +237,12 @@ get_type(SV* sv)
     case SVt_PVGV:
       type = GLOBREF;
       break;
+    /* Perl 5.10 has a bunch of new types that I don't think will ever
+       actually show up here (I hope), but not handling them makes the
+       C compiler cranky. */
+    default:
+      type = UNKNOWN;
+      break;
   }
 
   if (type) {
@@ -233,7 +250,7 @@ get_type(SV* sv)
     return type;
   }
 
-  /* I really hope this never happens */
+  /* Getting here should not be possible */
   return UNKNOWN;
 }
 
@@ -542,12 +559,14 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
 
         package = *av_fetch(array, i, 1);
         SvGETMAGIC(package);
-        if (! validate_isa(value, package, id, options))
+        if (! validate_isa(value, package, id, options)) {
           return 0;
+        }
       }
     } else {
-      if (! validate_isa(value, *temp, id, options))
+      if (! validate_isa(value, *temp, id, options)) {
         return 0;
+      }
     }
   }
 
@@ -557,18 +576,20 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
     if (SvROK(*temp) && SvTYPE(SvRV(*temp)) == SVt_PVAV) {
       AV* array = (AV*) SvRV(*temp);
 
-      for(i = 0; i <= av_len(array); i++) {
+      for (i = 0; i <= av_len(array); i++) {
         SV* method;
 
         method = *av_fetch(array, i, 1);
         SvGETMAGIC(method);
 
-        if (! validate_can(value, method, id, options))
+        if (! validate_can(value, method, id, options)) {
           return 0;
+        }
       }
     } else {
-      if (! validate_can(value, *temp, id, options))
+      if (! validate_can(value, *temp, id, options)) {
         return 0;
+      }
     }
   }
 
@@ -657,9 +678,15 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
 
       svp = (SV*)SvRV(*temp);
 
+#if PERL_VERSION <= 10
       if (SvMAGICAL(svp) && mg_find(svp, PERL_MAGIC_qr)) {
         has_regex = 1;
       }
+#else
+      if (SvTYPE(svp) == SVt_REGEXP) {
+        has_regex = 1;
+      }
+#endif
     }
 
     if (!has_regex) {
@@ -693,8 +720,9 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
   }
 
   if ((temp = hv_fetch(spec, "untaint", 7, 0))) {
-    if (SvTRUE(*temp))
+    if (SvTRUE(*temp)) {
       *untaint = 1;
+    }
   }
 
   return 1;
@@ -739,8 +767,13 @@ convert_array2hash(AV* in, HV* options, HV* out)
 
     key = *av_fetch(in, i, 1);
     SvGETMAGIC(key);
-    value = *av_fetch(in, i + 1, 1);
-    SvGETMAGIC(value);
+
+    /* We need to make a copy because if the array was @_, then the
+       values in the array are marked as readonly, which causes
+       problems when the hash being made gets returned to the
+       caller. */
+    value = newSVsv( *av_fetch(in, i + 1, 1) ); SvGETMAGIC(value);
+
     if (! hv_store_ent(out, key, SvREFCNT_inc(value), 0)) {
       SvREFCNT_dec(value);
       croak("Cannot add new key to hash");
@@ -871,9 +904,10 @@ normalize_hash_keys(HV* p, SV* normalize_func, SV* strip_leading, IV ignore_case
     normalized =
       normalize_one_key(HeSVKEY_force(he), normalize_func, strip_leading, ignore_case);
 
-    if (hv_fetch_ent(norm_p, normalized, 0, 0))
+    if (hv_fetch_ent(norm_p, normalized, 0, 0)) {
       croak("The normalize_keys callback returned a key that already exists, '%s', when normalizing the key '%s'",
             SvPV_nolen(normalized), SvPV_nolen(HeSVKEY_force(he)));
+    }
 
     if (! hv_store_ent(norm_p, normalized, SvREFCNT_inc(HeVAL(he)), 0)) {
       SvREFCNT_dec(HeVAL(he));
@@ -899,7 +933,9 @@ validate_pos_depends(AV* p, AV* specs, HV* options)
 
       depends = hv_fetch((HV*) SvRV(*p_spec), "depends", 7, 0);
 
-      if (! depends) return 1;
+      if (! depends) {
+        return 1;
+      }
 
       if (SvROK(*depends)) {
         croak("Arguments to 'depends' for validate_pos() must be a scalar");
@@ -948,7 +984,9 @@ validate_named_depends(HV* p, HV* specs, HV* options)
 
         depends_value = hv_fetch((HV*) SvRV(HeVAL(he1)), "depends", 7, 0);
 
-        if (! depends_value) return 1;
+        if (! depends_value) {
+          return 1;
+        }
 
         if (! SvROK(*depends_value)) {
           depends_list = (AV*) sv_2mortal((SV*) newAV());
@@ -1259,8 +1297,9 @@ validate(HV* p, HV* specs, HV* options, HV* ret)
   }
 
   if (GIMME_V != G_VOID) {
-    for (i = 0; i <= av_len(untaint_keys); i++)
+    for (i = 0; i <= av_len(untaint_keys); i++) {
       SvTAINTED_off(HeVAL(hv_fetch_ent(p, *av_fetch(untaint_keys, i, 0), 0, 0)));
+    }
   }
 
   return 1;
@@ -1323,8 +1362,9 @@ spec_says_optional(SV* spec, IV complex_spec)
       return FALSE;
     }
   } else {
-    if (SvTRUE(spec)) 
+    if (SvTRUE(spec)) {
       return FALSE;
+    }
   }
   return TRUE;
 }
@@ -1349,8 +1389,9 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret)
     IV p_count    = av_len(p);
     IV max        = spec_count > p_count ? spec_count : p_count;
 
-    if (GIMME_V == G_VOID)
+    if (GIMME_V == G_VOID) {
       return 1;
+    }
     
     for (i = 0; i <= max; i++) {
       if (i <= spec_count) {
@@ -1397,22 +1438,26 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret)
         sv_catpv(buffer, ")");
 
         if (! validate_one_param(value, (SV*) p, (HV*) SvRV(spec),
-                                 buffer, options, &untaint))
+                                 buffer, options, &untaint)) {
           return 0;
+        }
 
-        if (untaint)
+        if (untaint) {
           av_push(untaint_indexes, newSViv(i));
+        }
       }
 
-      if (GIMME_V != G_VOID)
+      if (GIMME_V != G_VOID) {
         av_push(ret, SvREFCNT_inc(value));
+      }
 
     } else if (complex_spec &&
                (temp = hv_fetch((HV*) SvRV(spec), "default", 7, 0))) {
       SvGETMAGIC(*temp);
 
-      if (GIMME_V != G_VOID)
+      if (GIMME_V != G_VOID) {
         av_push(ret, SvREFCNT_inc(*temp));
+      }
 
     } else {
       if (i == min) {
@@ -1470,8 +1515,9 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret)
   }
 
   if (GIMME_V != G_VOID) {
-    for (i = 0; i <= av_len(untaint_indexes); i++)
+    for (i = 0; i <= av_len(untaint_indexes); i++) {
       SvTAINTED_off(*av_fetch(p, SvIV(*av_fetch(untaint_indexes, i, 0)), 0));
+    }
   }
 
   return 1;
@@ -1496,7 +1542,9 @@ _validate(p, specs)
     HV* ph;
     HV* options;
 
-    if (no_validation() && GIMME_V == G_VOID) XSRETURN(0);
+    if (no_validation() && GIMME_V == G_VOID) {
+      XSRETURN(0);
+    }
 
     SvGETMAGIC(p);
     if (! (SvROK(p) && SvTYPE(SvRV(p)) == SVt_PVAV)) {
@@ -1527,16 +1575,19 @@ _validate(p, specs)
     if (! ph) {
       ph = (HV*) sv_2mortal((SV*) newHV());
 
-      if (! convert_array2hash(pa, options, ph) )
+      if (! convert_array2hash(pa, options, ph) ) {
         XSRETURN(0);
+      }
     }
 
         
-    if (GIMME_V != G_VOID)
+    if (GIMME_V != G_VOID) {
       ret = (HV*) sv_2mortal((SV*) newHV());
+    }
 
-    if (! validate(ph, (HV*) SvRV(specs), options, ret))
+    if (! validate(ph, (HV*) SvRV(specs), options, ret)) {
       XSRETURN(0);
+    }
 
     RETURN_HASH(ret);
 
@@ -1552,7 +1603,9 @@ _validate_pos(p, ...)
     AV* ret = NULL;
     IV i;
 
-    if (no_validation() && GIMME_V == G_VOID) XSRETURN(0);
+    if (no_validation() && GIMME_V == G_VOID) {
+      XSRETURN(0);
+    }
 
     SvGETMAGIC(p);
     if (!SvROK(p) || !(SvTYPE(SvRV(p)) == SVt_PVAV)) {
@@ -1568,10 +1621,13 @@ _validate_pos(p, ...)
       }
     }
 
-    if (GIMME_V != G_VOID) ret = (AV*) sv_2mortal((SV*) newAV());
+    if (GIMME_V != G_VOID) {
+      ret = (AV*) sv_2mortal((SV*) newAV());
+    }
 
-    if (! validate_pos((AV*) SvRV(p), specs, get_options(NULL), ret))
+    if (! validate_pos((AV*) SvRV(p), specs, get_options(NULL), ret)) {
       XSRETURN(0);
+    }
 
     RETURN_ARRAY(ret);
 
@@ -1614,10 +1670,14 @@ _validate_with(...)
       if (SvROK(params) && SvTYPE(SvRV(params)) == SVt_PVAV) {
         AV* ret = NULL;
 
-        if (GIMME_V != G_VOID) ret = (AV*) sv_2mortal((SV*) newAV());
+        if (GIMME_V != G_VOID) {
+          ret = (AV*) sv_2mortal((SV*) newAV());
+        }
+
         if (! validate_pos((AV*) SvRV(params), (AV*) SvRV(spec),
-                           get_options(p), ret))
+                           get_options(p), ret)) {
           XSRETURN(0);
+        }
 
         RETURN_ARRAY(ret);
       } else {
@@ -1660,11 +1720,13 @@ _validate_with(...)
         croak("Expecting array or hash reference in 'params'");
       }
 
-      if (GIMME_V != G_VOID)
+      if (GIMME_V != G_VOID) {
         ret = (HV*) sv_2mortal((SV*) newHV());
+      }
 
-      if (! validate(hv, (HV*) SvRV(spec), options, ret))
+      if (! validate(hv, (HV*) SvRV(spec), options, ret)) {
         XSRETURN(0);
+      }
 
       RETURN_HASH(ret);
     } else {
