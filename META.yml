@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Params-Validate
-version:             0.90
+version:             0.91
 abstract:            Validate method/function parameters
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.36
