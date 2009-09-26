@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 29d8932f084264a22773e2a10a22c941cbd72cb9 Build.PL
+SHA1 7ac0d329771ed014aba99d2fbc3a3d9ce2ccfea2 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 86012df144b6ca1966045b08608567f6c6b06a80 MANIFEST
+SHA1 418fe54de113a8867b9bf065fdd2e21f1c8af912 META.yml
+SHA1 93a4345e70b7f95e8a1c89c3aeb4d24d31708f36 Makefile.PL
+SHA1 b46690b8ddcb788d1011fc041b968dd379a63e1b README
+SHA1 f63714390d38bc4e1a6769fc8cb3f6ce796c2ffb TODO
+SHA1 c5e1df5ee5feb3f35175c3cdc45dbe89e15276f5 benchmarks/basic
+SHA1 fdc6f1f1efb37342d0c63ed913a98bb7deaf1634 c/ppport.h
+SHA1 a782f689522c0d5739bd27d86fb9b8104cffeaa6 lib/Attribute/Params/Validate.pm
+SHA1 387656e47aaa91f730cc6d11256e63329c6cd7f2 lib/Params/Validate.pm
+SHA1 401c251ac147a68a796d9563a3c203049158c388 lib/Params/Validate.xs
+SHA1 7e9a4cafd2f5db7b93c0b0cb297aef32c3b86585 lib/Params/ValidatePP.pm
+SHA1 10ea6bcb0797098ccd9ec9ee2abbcc3ae06a866c lib/Params/ValidateXS.pm
+SHA1 9dbb8db7b99554555bbbcfb5ae1c562a80cf54bc t/01-validate.t
+SHA1 e7c75a0e962e40b669e6f48cc6e1eec6e6aa4edf t/02-noop.t
+SHA1 1eb7ecc3066ec155f39254d62ef6a61f85015525 t/03-attribute.t
+SHA1 04f063bee216138dcdde7a500b8037267a70612f t/04-defaults.t
+SHA1 66b948f9ce08fbda0cb53e858f310e48bd14cd1e t/05-noop_default.t
+SHA1 c09e373f52fec166b61b1b8208599c0c9287740b t/06-options.t
+SHA1 7c4e78ba7b3ce6943a6c749d6be2d38b784cb817 t/07-with.t
+SHA1 d950aa1f93f7688e16acf5f9f7bc8bbef7100148 t/08-noop_with.t
+SHA1 2e5fae7c2c8e8e1853585dfe9e4c2292926bd19e t/09-regex.t
+SHA1 64f8728353682baf5ac781a161fd4d4e8acfa0df t/10-noop_regex.t
+SHA1 ee0f80db351aed46e2c3919cb27f1ba239d68047 t/11-cb.t
+SHA1 9930b49f1e19337d5e703d802ed40c36005b7769 t/12-noop_cb.t
+SHA1 b9a31f6825cfa6a318acd20d014afc7dc84d0e77 t/13-taint.t
+SHA1 ecb0b98fb3014ed1be54545b5f70f0a6045b8022 t/14-no_validate.t
+SHA1 ba58251b41a70db8ec56174a398cd899ba8b6ecd t/15-case.t
+SHA1 a9afc7b2d35a3e7b9642e593d72e0346962e7a7f t/16-normalize.t
+SHA1 659911bf1c49aa265eedfc8e6f3b6d7392839cde t/17-callbacks.t
+SHA1 5efe994c5f46ba355e306bdea19923a796ebaa2e t/18-depends.t
+SHA1 01880fbeb3b2dfd3c9d63a2f99b92bcf66e8ce9d t/19-untaint.t
+SHA1 6b4c32a78868cb4de55d0b6bbe4b39605db4a673 t/21-can.t
+SHA1 7bf82eec9f2569acf36637d9e9622329dce6c59a t/22-overload-can-bug.t
+SHA1 bac1f2333cb890209f19179fd7cf510655a2a32b t/23-readonly.t
+SHA1 b009369ee3b9ca4fe3d1a9784014bfd7e6139c17 t/24-tied.t
+SHA1 ef42297435b7153a5b7d2622e410edf7b6bc87b0 t/25-undef-regex.t
+SHA1 207a311300bb29677225508ce28499e3d1973b72 t/26-isa.t
+SHA1 7f8b9d96ad268d33e888d9f615758f268873a2f8 t/27-string-as-type.t
+SHA1 7fa2900acbd8988dbe515d0ea0d7d4503248b6ac t/28-readonly-return.t
+SHA1 cf2f7c79ad212aa2baf44f139e323884f0a82038 t/29-taint-mode.t
+SHA1 9ade2293d6e5ea77d94532132c89cd205ea85ed7 t/kwalitee.t
+SHA1 8c26974397ae27725f20b106620d6ef256fda33c t/lib/PVTests.pm
+SHA1 edca2e648d582321665c4203a31e1d2bfb0f4c15 t/lib/PVTests/Callbacks.pm
+SHA1 5bee4f1d13458e2b141f8a312bda7c9dfa5684a1 t/lib/PVTests/Defaults.pm
+SHA1 24cc3e050f4065aefd84a4abaa3325153c5864a0 t/lib/PVTests/Regex.pm
+SHA1 3f9fe83b5d9dee0a858f5d4702a3ba966fc9f60c t/lib/PVTests/Standard.pm
+SHA1 fe172a90ef974eaec55d44297dd569b41fcb1236 t/lib/PVTests/With.pm
+SHA1 c8c0c74e3cf401467a39e01b1bd4b4c5446202cb t/pod-coverage.t
+SHA1 cec881e89926d320475f9de2b7fad02c2169f510 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkq9gAcACgkQIgMCsV8qvRJpCQCfYBJFuY47sKEpU2OSXYwGQeDt
+vlEAnjunGmGYmPrAgX5cXfl0kfPTO7nM
+=fhyJ
+-----END PGP SIGNATURE-----

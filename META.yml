@@ -1,16 +1,32 @@
---- #YAML:1.0
-name:                Params-Validate
-version:             0.91
-abstract:            Validate method/function parameters
-license:             perl
-generated_by:        ExtUtils::MakeMaker version 6.36
-distribution_type:   module
-requires:     
-    Attribute::Handlers:           0
-    Scalar::Util:                  0
-    Test::More:                    0
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+name: Params-Validate
+version: 0.92
 author:
-    - Dave Rolsky, <autarch@urth.org>
+  - 'Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>'
+abstract: Validate method/function parameters
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Validate
+  license: http://dev.perl.org/licenses/
+  repository: https://svn.urth.org/svn/Params-Validate
+build_requires:
+  ExtUtils::CBuilder: 0
+  Pod::Man: 1.14
+  Test::More: 0.34
+requires:
+  Attribute::Handlers: 0.79
+  Scalar::Util: 1.10
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Attribute::Params::Validate:
+    file: lib/Attribute/Params/Validate.pm
+    version: ' 1.07'
+  Params::Validate:
+    file: lib/Params/Validate.pm
+    version: 0.92
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
