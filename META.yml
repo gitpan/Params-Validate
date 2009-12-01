@@ -20,7 +20,7 @@ provides:
     version: 1.07
   Params::Validate:
     file: lib/Params/Validate.pm
-    version: 0.93
+    version: 0.94
 requires:
   Attribute::Handlers: 0.79
   Scalar::Util: 1.10
@@ -29,4 +29,4 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Validate
   license: http://dev.perl.org/licenses/
   repository: https://svn.urth.org/svn/Params-Validate
-version: 0.93
+version: 0.94
