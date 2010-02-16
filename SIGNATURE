@@ -14,17 +14,17 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 cc3ec4a84619c9678da4a4a3f7998a0d76613878 Build.PL
-SHA1 2cae495b30428baffa8bd1e1849ffdf11b177f80 Changes
+SHA1 50506a81364c0730ca8b560cbedddcc038958fda Build.PL
+SHA1 95b5590b613385038d0f0e4b98516f852c792b47 Changes
 SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
 SHA1 6347bad82563d8aded62cc46a5e35db8cea73277 MANIFEST
-SHA1 9c622ba431a65ce82f021eb9547a2319f19ca0ce META.yml
+SHA1 c6d717fc033f5bbd04c0087051301bb92179a91d META.yml
 SHA1 b46690b8ddcb788d1011fc041b968dd379a63e1b README
 SHA1 f63714390d38bc4e1a6769fc8cb3f6ce796c2ffb TODO
 SHA1 c5e1df5ee5feb3f35175c3cdc45dbe89e15276f5 benchmarks/basic
 SHA1 fdc6f1f1efb37342d0c63ed913a98bb7deaf1634 c/ppport.h
 SHA1 a782f689522c0d5739bd27d86fb9b8104cffeaa6 lib/Attribute/Params/Validate.pm
-SHA1 265d405ad24ffdae6ed884b08a27baec99455839 lib/Params/Validate.pm
+SHA1 e1e8ec46caf2ba70d093af8068f08118e0104aac lib/Params/Validate.pm
 SHA1 2e328e04aa0ae90981b7529bc9bf211ff80bc65c lib/Params/Validate.xs
 SHA1 b249f5f19d27d765490d810b9897816cf49e4bb9 lib/Params/ValidatePP.pm
 SHA1 10ea6bcb0797098ccd9ec9ee2abbcc3ae06a866c lib/Params/ValidateXS.pm
@@ -55,7 +55,7 @@ SHA1 744284312241a84de8dd8792ec6bffce7ec5d500 t/25-undef-regex.t
 SHA1 49dc8b6282c38db2dd0557da9a72edcd0777696f t/26-isa.t
 SHA1 d68dc04e0a177a5db71625cd0c5ae72037ea957c t/27-string-as-type.t
 SHA1 31318e7cb891ab7c8acf1395fdcd55f29a9d7b3e t/28-readonly-return.t
-SHA1 c57acb526c29fa7e16243c63b17f89796ab73f90 t/29-taint-mode.t
+SHA1 4997842666f73e1419959153c6c619fbb97677c4 t/29-taint-mode.t
 SHA1 339f85b0dbe2ca118db8461416578cc8c3d239e4 t/30-hashref-alteration.t
 SHA1 bc8002b5381233a4b40f93d7e81ba771938df900 t/kwalitee.t
 SHA1 bfc6152b69aab3d1d7da54480f24cfed98f257dc t/lib/PVTests.pm
@@ -69,7 +69,7 @@ SHA1 cf914eb0e7f3441d0b4db726dbe471a9ef40242d t/pod.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEARECAAYFAksVk2IACgkQIgMCsV8qvRJRYgCeMgmmFj698vrC71FrkZ1A4/8t
-mVMAn1SPtPqC2STBunODp2ZFygEL9U2d
-=Agew
+iEYEARECAAYFAkt6osUACgkQIgMCsV8qvRLZ5gCdFTFp8n28McFaUJnHNbRKfT4/
+7MwAn0jSgiRnoPeqokgyZmnnfUjXPugg
+=/RgS
 -----END PGP SIGNATURE-----

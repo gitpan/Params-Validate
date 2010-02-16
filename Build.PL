@@ -31,7 +31,7 @@ my $builder = Module::Build->new(
             bugtracker =>
                 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Validate',
             repository =>
-                'https://svn.urth.org/svn/Params-Validate',
+                'http://hg.urth.org/hg/Params-Validate',
         },
     },
 );
@@ -44,7 +44,7 @@ if ($force_pp) {
 $builder->create_build_script();
 
 sub _make_pp_tests {
-    return unless -d '.svn';
+    return unless -d '.hg' || $ENV{AUTHOR_TESTING};
 
     require File::Slurp;
     File::Slurp->import(qw( read_file write_file ));
