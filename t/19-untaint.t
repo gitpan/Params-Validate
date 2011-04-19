@@ -1,6 +1,7 @@
-#!/usr/bin/perl -Tw
+#!/usr/bin/perl -T
 
 use strict;
+use warnings;
 
 use Params::Validate qw(validate validate_pos);
 use Test::More;
@@ -8,9 +9,6 @@ use Test::More;
 eval "use Test::Taint 0.02";
 if ($@) {
     plan skip_all => 'These tests require Test::Taint 0.02+ to run';
-}
-else {
-    plan tests => 9;
 }
 
 taint_checking_ok('These tests are meaningless unless we are in taint mode.');
@@ -86,3 +84,5 @@ taint_checking_ok('These tests are meaningless unless we are in taint mode.');
 
     tainted_ok( $new_value, 'value is still tainted after validation' );
 }
+
+done_testing();

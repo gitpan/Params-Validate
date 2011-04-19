@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.55.
+signed via the Module::Signature module, version 0.66.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,62 +14,100 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 50506a81364c0730ca8b560cbedddcc038958fda Build.PL
-SHA1 95b5590b613385038d0f0e4b98516f852c792b47 Changes
-SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
-SHA1 6347bad82563d8aded62cc46a5e35db8cea73277 MANIFEST
-SHA1 c6d717fc033f5bbd04c0087051301bb92179a91d META.yml
-SHA1 b46690b8ddcb788d1011fc041b968dd379a63e1b README
+SHA1 56ea538a792e87973af3105df79e87fd33ccf936 Build.PL
+SHA1 65bff4ffc36ba63ca8321efe82e5437eb5d3b4e0 Changes
+SHA1 5c079fd98dd3d3f0a7148234631ca3b30f9d2a80 INSTALL
+SHA1 7e9ec08bb3a11d084050d04bac566e882b8b839d LICENSE
+SHA1 3ac54ccbee3e742c2c17fb79bbceb27a78ef1e63 MANIFEST
+SHA1 9b6fa2847e36df5ece2295ed17ff583c2f170ab9 META.json
+SHA1 ca63cfd005afa79d26240f5d1daed05a0ffbf8ff META.yml
+SHA1 306f73db6e25931b17aaeb9b876e33420aa5c47f README
 SHA1 f63714390d38bc4e1a6769fc8cb3f6ce796c2ffb TODO
 SHA1 c5e1df5ee5feb3f35175c3cdc45dbe89e15276f5 benchmarks/basic
-SHA1 fdc6f1f1efb37342d0c63ed913a98bb7deaf1634 c/ppport.h
-SHA1 a782f689522c0d5739bd27d86fb9b8104cffeaa6 lib/Attribute/Params/Validate.pm
-SHA1 e1e8ec46caf2ba70d093af8068f08118e0104aac lib/Params/Validate.pm
-SHA1 2e328e04aa0ae90981b7529bc9bf211ff80bc65c lib/Params/Validate.xs
-SHA1 b249f5f19d27d765490d810b9897816cf49e4bb9 lib/Params/ValidatePP.pm
-SHA1 10ea6bcb0797098ccd9ec9ee2abbcc3ae06a866c lib/Params/ValidateXS.pm
+SHA1 847ddd74867e960646b4c166ab42047db4f9a1c4 c/ppport.h
+SHA1 4883cc339595e793d06340b1cf7c366b8cb03de6 dist.ini
+SHA1 2d1f339f1a2ceb22c2657d7c21983f69bc7456e3 inc/MyModuleBuild.pm
+SHA1 9794580a7447c0fd801a6db3859834607aef7f4c lib/Attribute/Params/Validate.pm
+SHA1 d0fb707c9ab61ec5ebcb393e5fb29d1228f43d40 lib/Params/Validate.pm
+SHA1 9f38ac15de8bc3363ecaadfa84b29b0a4ae2b00f lib/Params/Validate.xs
+SHA1 aaf9bb96473f4a69968f8974ce76544e8a9b18bc lib/Params/ValidatePP.pm
+SHA1 66ce113fb021772913964431a705cdbda7541a27 lib/Params/ValidateXS.pm
 SHA1 9dbb8db7b99554555bbbcfb5ae1c562a80cf54bc t/01-validate.t
 SHA1 e7c75a0e962e40b669e6f48cc6e1eec6e6aa4edf t/02-noop.t
-SHA1 af6ab9cc849b8bcd9e7c76c299871d8ce328ad00 t/03-attribute.t
+SHA1 6d8bf111ea87f5119ae2f96c46a5fda5ddc09202 t/03-attribute.t
 SHA1 04f063bee216138dcdde7a500b8037267a70612f t/04-defaults.t
 SHA1 66b948f9ce08fbda0cb53e858f310e48bd14cd1e t/05-noop_default.t
-SHA1 562abbb9374206221880fbf37728f3b1b702725a t/06-options.t
+SHA1 07417fcb10d2f5e2554957622be228d41e74c96a t/06-options.t
 SHA1 7c4e78ba7b3ce6943a6c749d6be2d38b784cb817 t/07-with.t
 SHA1 d950aa1f93f7688e16acf5f9f7bc8bbef7100148 t/08-noop_with.t
 SHA1 2e5fae7c2c8e8e1853585dfe9e4c2292926bd19e t/09-regex.t
 SHA1 64f8728353682baf5ac781a161fd4d4e8acfa0df t/10-noop_regex.t
 SHA1 ee0f80db351aed46e2c3919cb27f1ba239d68047 t/11-cb.t
 SHA1 9930b49f1e19337d5e703d802ed40c36005b7769 t/12-noop_cb.t
-SHA1 b9a31f6825cfa6a318acd20d014afc7dc84d0e77 t/13-taint.t
-SHA1 1f53413968c3237d9544e98592fa6eca3f398cb0 t/14-no_validate.t
-SHA1 f066c1aa9272ab187646ae00011924a6cdfb7c6b t/15-case.t
-SHA1 3662c4ab64eacc5ab47610a5a07e7fb1b46b3725 t/16-normalize.t
-SHA1 0207daa7d0651f5b17b422a0bc7c64a500a4e6b3 t/17-callbacks.t
-SHA1 3ebc39f1ade0f22c6f2499944d7a0d8b63d23f09 t/18-depends.t
-SHA1 27d8b9ac8031c268e0be04e5eded486fa5c42ff2 t/19-untaint.t
-SHA1 9179ca60fe7ed6c5fa0ba2fbccf07a2c044da57e t/21-can.t
-SHA1 e1dd31093e7ff5d0ec2c85a270e47e7a6f0357af t/22-overload-can-bug.t
-SHA1 d22cdb9f1e47c9293b21cf55682887b5e9ef5aee t/23-readonly.t
-SHA1 19e769013309b05975f1e755a6f86aa3fe4c2376 t/24-tied.t
-SHA1 744284312241a84de8dd8792ec6bffce7ec5d500 t/25-undef-regex.t
-SHA1 49dc8b6282c38db2dd0557da9a72edcd0777696f t/26-isa.t
-SHA1 d68dc04e0a177a5db71625cd0c5ae72037ea957c t/27-string-as-type.t
-SHA1 31318e7cb891ab7c8acf1395fdcd55f29a9d7b3e t/28-readonly-return.t
-SHA1 4997842666f73e1419959153c6c619fbb97677c4 t/29-taint-mode.t
-SHA1 339f85b0dbe2ca118db8461416578cc8c3d239e4 t/30-hashref-alteration.t
-SHA1 bc8002b5381233a4b40f93d7e81ba771938df900 t/kwalitee.t
-SHA1 bfc6152b69aab3d1d7da54480f24cfed98f257dc t/lib/PVTests.pm
-SHA1 6f95b301d5f75144f7f3b0775dc8e4ec9651b0bf t/lib/PVTests/Callbacks.pm
-SHA1 3abcff4c64f5ecd195e98cf65f1fac4527d25e2b t/lib/PVTests/Defaults.pm
+SHA1 1b4c7a59750085dd447895ee802e15319eca0c37 t/13-taint.t
+SHA1 dc3d0da567e7d2869be972d82e0321b300f8584c t/14-no_validate.t
+SHA1 2f0ce36a35e33010500c18ae6164415ff23b6975 t/15-case.t
+SHA1 ca88b618644be290c45096a69fd5089716b35cea t/16-normalize.t
+SHA1 b297cc522845df12f0f24694a7bfea101c98094c t/17-callbacks.t
+SHA1 fa87caa1999d716fa1640fe097cbbab8fb82695e t/18-depends.t
+SHA1 2cb411cc992020e8284de925d717c5e8b2006c42 t/19-untaint.t
+SHA1 18cb2c0b3682312cc6849e49b08ea67bac1dc0b1 t/21-can.t
+SHA1 568620806d1a72032f8c4c09c09e6b4a12c6e0e0 t/22-overload-can-bug.t
+SHA1 8be520ff3910ee5194cf9e2bf03111543d74ca3e t/23-readonly.t
+SHA1 21001273a948e0f5824b01abc79a6c2cf0ab3d4f t/24-tied.t
+SHA1 f116c1d79d945d12ffec09ed75b32ceb37c9139e t/25-undef-regex.t
+SHA1 a02f95ffaaba2421fd44ab7dfd8b3e0ac0879f1d t/26-isa.t
+SHA1 ff15a9b080d2768bf39bcbc23aad52ebe9e36de2 t/27-string-as-type.t
+SHA1 5ecfa487288af372926a2db6faec816a128496be t/28-readonly-return.t
+SHA1 479dc89fe42aeb57830a74f79cf546ec6365e4a4 t/29-taint-mode.t
+SHA1 3a7a19225d6a3d7b271099d37e03eb04c53c3c5a t/30-hashref-alteration.t
+SHA1 eccb171b24a8447bb4618899d700b66f9b75b075 t/31-incorrect-spelling.t
+SHA1 4bb9fedb88c152bdda3546f07415432be2e4e1f8 t/lib/PVTests.pm
+SHA1 e44bf58b862952618ee21344c1368b3f9d573b61 t/lib/PVTests/Callbacks.pm
+SHA1 56a308a328ea841e0b5cdfee9dafae92f982239f t/lib/PVTests/Defaults.pm
 SHA1 8fd1def0c13ee66d52b067720b69e3d7f5b88f6a t/lib/PVTests/Regex.pm
-SHA1 6608b6c33e0dd50f8a661a8b5a7c0b26b8b9b8f3 t/lib/PVTests/Standard.pm
-SHA1 390acebd04ac9cb2b96cc0ef55695a474b4281c7 t/lib/PVTests/With.pm
-SHA1 664fae4a03960375b8d4159683dbb2e427011645 t/pod-coverage.t
-SHA1 cf914eb0e7f3441d0b4db726dbe471a9ef40242d t/pod.t
+SHA1 5e5934696badf50e400d508a8e25a2f38c6725fc t/lib/PVTests/Standard.pm
+SHA1 3cdf0a4e3878cf58ed7606bd09d77fb22c87278f t/lib/PVTests/With.pm
+SHA1 2346c6403f21d316327ee1d2b7857a60c76ef278 t/release-cpan-changes.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 0911f807d91b510dfe9b7b0209544ccb111f8acc t/release-pod-coverage.t
+SHA1 887c6a77da93efc67a935fd77ce7002d8dc0a29c t/release-pod-spell.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 00843f2d313f995505e9f31e4d9861396c18654b t/release-pp-01-validate.t
+SHA1 1045a7b3ec0c0f9958880ee8d2a931abe76ccd03 t/release-pp-02-noop.t
+SHA1 8b48a48518b4c4d39296e8f831a1c632d2c740c5 t/release-pp-03-attribute.t
+SHA1 e8a2f728e777bfc00575624fd56d821c3a306028 t/release-pp-04-defaults.t
+SHA1 52eab2cb6c0f9af6f588d1e0d40d98e2a3127167 t/release-pp-05-noop_default.t
+SHA1 8b1cfd528cfe9fb8665615bc729ab2e16fe08baa t/release-pp-06-options.t
+SHA1 c90acb6f575748451ecb31ebd56ef4fa30fb3e50 t/release-pp-07-with.t
+SHA1 2c55856beec02e3260f0d4efa7bfdac87754bc7c t/release-pp-08-noop_with.t
+SHA1 bd56ce0f106fb8bb691b2542108d681294fb6502 t/release-pp-09-regex.t
+SHA1 cf96f8f90956ec9585837b5c2278d616fe426049 t/release-pp-10-noop_regex.t
+SHA1 ce0fabc6bbc43ecb0ba92e5688c4baf6baa7fc60 t/release-pp-11-cb.t
+SHA1 14b0aaf735e7367f2017da8e71c650b989b2b56d t/release-pp-12-noop_cb.t
+SHA1 9beb89ef8fa3e07858ade683e9c00f6b9ac39d06 t/release-pp-13-taint.t
+SHA1 8bb4551f9d781f036e0c40637c22c448f298db61 t/release-pp-14-no_validate.t
+SHA1 70b1e7cbaa7c53b075cacde92a7f31d636592653 t/release-pp-15-case.t
+SHA1 11ba1066ce1e4e9f0ec6fb92defd186b9bd8fadf t/release-pp-16-normalize.t
+SHA1 56ca2f7d7d01c294e862cc3641a17e2fff6e3640 t/release-pp-17-callbacks.t
+SHA1 556ef8d8febb7767563eca1bffd478566fb09a60 t/release-pp-18-depends.t
+SHA1 e411de4a1ceb1cee9749f4abc95045b241bda565 t/release-pp-19-untaint.t
+SHA1 c39a2fdfcf1a188efe1118496537e266a3cce315 t/release-pp-21-can.t
+SHA1 ad0a28b5c5c541d6ca9ec87bcdb693258ed23db5 t/release-pp-22-overload-can-bug.t
+SHA1 05a200897cd49e73a421f4e7486a509bf5e3d8a4 t/release-pp-23-readonly.t
+SHA1 7e436f55bc5a390ea13de9efcde2251914b6ee6c t/release-pp-24-tied.t
+SHA1 d1412aba3f8b6f6ef85a16ba48f86ac24ccd000b t/release-pp-25-undef-regex.t
+SHA1 30481e0efbc52d70c46afdde263e3a769de45a1b t/release-pp-26-isa.t
+SHA1 107dd49c858204105da5fe33493e89922087a731 t/release-pp-27-string-as-type.t
+SHA1 9098531dc80150ef15343f7abb5edc359a6ce253 t/release-pp-28-readonly-return.t
+SHA1 4797b4cba42f8e0103ea35e150fa833d6a9f58e7 t/release-pp-29-taint-mode.t
+SHA1 2cff8f29291b4dbf679b7598401aef88c884c75b t/release-pp-30-hashref-alteration.t
+SHA1 309c7199b7fbce1dfcb0fd02673685141aace1b3 t/release-pp-31-incorrect-spelling.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+Version: GnuPG v1.4.10 (GNU/Linux)
 
-iEYEARECAAYFAkt6osUACgkQIgMCsV8qvRLZ5gCdFTFp8n28McFaUJnHNbRKfT4/
-7MwAn0jSgiRnoPeqokgyZmnnfUjXPugg
-=/RgS
+iEYEARECAAYFAk2t4lkACgkQIgMCsV8qvRIWOQCeL0/ntfP3pU/KcSNWV1r9A/Dk
+vLMAn1usYMDaeynvxHha8QpfCzjax3Lr
+=Ghdq
 -----END PGP SIGNATURE-----

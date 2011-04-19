@@ -1,4 +1,7 @@
 package Params::Validate;
+BEGIN {
+  $Params::Validate::VERSION = '0.96';
+}
 
 use strict;
 use warnings;
@@ -450,8 +453,18 @@ sub _normalize_named {
     return \%h;
 }
 
+my %Valid = map { $_ => 1 }
+    qw( callbacks can default depends isa optional regex type untaint  );
+
 sub _validate_one_param {
     my ( $value, $params, $spec, $id ) = @_;
+
+    for my $key ( keys %{$spec} ) {
+        unless ( $Valid{$key} ) {
+            $options->{on_fail}
+                ->(qq{"$key" is not an allowed validation spec key});
+        }
+    }
 
     if ( exists $spec->{type} ) {
         unless ( defined $spec->{type}
@@ -495,7 +508,12 @@ sub _validate_one_param {
 
     if ( exists $spec->{isa} ) {
         foreach ( ref $spec->{isa} ? @{ $spec->{isa} } : $spec->{isa} ) {
-            unless ( eval { $value->isa($_) } ) {
+            unless (
+                do {
+                    local $@;
+                    eval { $value->isa($_) };
+                }
+                ) {
                 my $is = ref $value ? ref $value : 'plain scalar';
                 my $article1 = $_  =~ /^[aeiou]/i ? 'an' : 'a';
                 my $article2 = $is =~ /^[aeiou]/i ? 'an' : 'a';
@@ -511,7 +529,12 @@ sub _validate_one_param {
 
     if ( exists $spec->{can} ) {
         foreach ( ref $spec->{can} ? @{ $spec->{can} } : $spec->{can} ) {
-            unless ( eval { $value->can($_) } ) {
+            unless (
+                do {
+                    local $@;
+                    eval { $value->can($_) };
+                }
+                ) {
                 my $called = _get_called(1);
 
                 $options->{on_fail}
@@ -690,11 +713,19 @@ sub _get_called {
 
 1;
 
-__END__
+# ABSTRACT: pure Perl implementation of Params::Validate
+
+
+
+=pod
 
 =head1 NAME
 
-Params::ValidatePP - pure Perl implementation of Params::Validate
+Params::Validate - pure Perl implementation of Params::Validate
+
+=head1 VERSION
+
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -705,10 +736,20 @@ Params::ValidatePP - pure Perl implementation of Params::Validate
 This is a pure Perl implementation of Params::Validate.  See the
 Params::Validate documentation for details.
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright (c) 2004-2007 David Rolsky.  All rights reserved.  This
-program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Dave Rolsky and Ilya Martynov.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
+
+
+__END__
+

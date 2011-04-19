@@ -1,4 +1,4 @@
-/* Copyright (c) 2000-2009 Dave Rolsky
+/* Copyright (c) 2000-2011 Dave Rolsky
    All rights reserved.
    This program is free software; you can redistribute it and/or
    modify it under the same terms as Perl itself.  See the LICENSE
@@ -8,8 +8,9 @@
 #include "perl.h"
 #include "XSUB.h"
 #define NEED_eval_pv
-#define NEED_sv_2pv_nolen
 #define NEED_newCONSTSUB
+#define NEED_sv_2pv_flags
+#define NEED_sv_2pv_nolen
 #include "ppport.h"
 
 #ifdef __GNUC__
@@ -79,35 +80,6 @@
                     } \
                 } STMT_END
 
-    /* These macros are used because Perl 5.6.1 (and presumably 5.6.0)
-           have problems if we try to die directly from XS code.  So instead,
-           we just set some global variables and return 0.  For 5.6.0,
-           validate(), validate_pos(), and validate_with() are thin Perl level
-           wrappers which localize these globals, call the XS sub, and then
-           check the globals afterwards. */
-
-#if (PERL_VERSION == 6)          /* 5.6.0 or 5.6.1 */
-#define FAIL(message, options) \
-    { \
-        SV* perl_error; \
-        SV* perl_on_fail; \
-        SV* on_fail; \
-        perl_error = get_sv("Params::Validate::ERROR", 0); \
-        if (! perl_error) \
-            croak("Cannot retrieve $Params::Validate::ERROR\n"); \
-        perl_on_fail = get_sv("Params::Validate::ON_FAIL", 0); \
-        if (! perl_on_fail) \
-            croak("Cannot retrieve $Params::Validate::ON_FAIL\n"); \
-        SvSetSV(perl_error, message); \
-        on_fail = get_on_fail(options); \
-        SvSetSV(perl_on_fail, on_fail); \
-        return 0; \
-    }
-#else                            /* any other version*/
-#define FAIL(message, options) \
-    validation_failure(message, options);
-#endif                           /* PERL_VERSION */
-
 /* module initialization */
 static void
 bootinit() {
@@ -134,7 +106,7 @@ INLINE static bool
 no_validation() {
     SV* no_v;
 
-    no_v = perl_get_sv("Params::Validate::NO_VALIDATION", 0);
+    no_v = get_sv("Params::Validate::NO_VALIDATION", 0);
     if (! no_v)
         croak("Cannot retrieve $Params::Validate::NO_VALIDATION\n");
 
@@ -259,12 +231,7 @@ get_type(SV* sv) {
 
 
 /* get an article for given string */
-INLINE
-#if (PERL_VERSION >= 6)          /* Perl 5.6.0+ */
-static const char*
-#else
-static char*
-#endif
+INLINE static const char*
 article(SV* string) {
     STRLEN len;
     char* rawstr;
@@ -285,22 +252,6 @@ article(SV* string) {
 }
 
 
-#if (PERL_VERSION == 6)          /* 5.6.0 or 5.6.1 */
-static SV*
-get_on_fail(HV* options) {
-    SV** temp;
-
-    if ((temp = hv_fetch(options, "on_fail", 7, 0))) {
-        SvGETMAGIC(*temp);
-        return *temp;
-    }
-    else {
-        return &PL_sv_undef;
-    }
-}
-#endif                           /* PERL_VERSION */
-
-#if (PERL_VERSION != 6)          /* not used with 5.6.0 or 5.6.1 */
 /* raises exception either using user-defined callback or using
    built-in method */
 static void
@@ -324,9 +275,8 @@ validation_failure(SV* message, HV* options) {
         PUTBACK;
         call_sv(on_fail, G_DISCARD);
     }
-
-    /* by default resort to Carp::confess for error reporting */
-    {
+    else {
+        /* by default resort to Carp::confess for error reporting */
         dSP;
         perl_require_pv("Carp.pm");
         PUSHMARK(SP);
@@ -337,7 +287,6 @@ validation_failure(SV* message, HV* options) {
 
     return;
 }
-#endif                           /* PERL_VERSION */
 
 /* get called subroutine fully qualified name */
 static SV*
@@ -360,12 +309,6 @@ get_called(HV* options) {
         else {
             frame = 1;
         }
-
-        /* With 5.6.0 & 5.6.1 there is an extra wrapper around the
-           validation subs which we want to ignore */
-        #if (PERL_VERSION == 6)
-        frame++;
-        #endif
 
         buffer = sv_2mortal(newSVpvf("(caller(%d))[3]", (int) frame));
         SvTAINTED_off(buffer);
@@ -440,7 +383,7 @@ validate_isa(SV* value, SV* package, SV* id, HV* options) {
             sv_catpv(buffer, "undef");
         }
         sv_catpv(buffer, ")\n");
-        FAIL(buffer, options);
+        validation_failure(buffer, options);
     }
 
     return 1;
@@ -496,12 +439,16 @@ validate_can(SV* value, SV* method, SV* id, HV* options) {
         sv_catpv(buffer, " does not have the method: '");
         sv_catsv(buffer, method);
         sv_catpv(buffer, "'\n");
-        FAIL(buffer, options);
+        validation_failure(buffer, options);
     }
 
     return 1;
 }
 
+#define VALID_KEY_COUNT 9
+static char* valid_keys[VALID_KEY_COUNT] = {
+  "callbacks", "can", "default", "depends", "isa", "optional", "regex", "type", "untaint"
+};
 
 /* validates specific parameter using supplied parameter specification */
 static IV
@@ -509,13 +456,36 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
     SV** temp;
     IV   i;
 
+    HE* he;
+    hv_iterinit(spec);
+
+    while (he = hv_iternext(spec)) {
+        STRLEN len;
+        char* key = HePV(he, len);
+        int ok = 0;
+        int j;
+        for ( j = 0; j < VALID_KEY_COUNT; j++ ) {
+            if ( strcmp( key, valid_keys[j] ) == 0) {
+                ok = 1;
+                break;
+            }
+        }
+
+        if ( ! ok ) {
+            SV* buffer = sv_2mortal(newSVpv("\"",0));
+            sv_catpv( buffer, key );
+            sv_catpv( buffer, "\" is not an allowed validation spec key\n");
+            validation_failure(buffer, options);
+        }
+    }
+
     /* check type */
     if ((temp = hv_fetch(spec, "type", 4, 0))) {
         IV type;
 
         if ( ! ( SvOK(*temp)
             && looks_like_number(*temp)
-        && SvIV(*temp) > 0 ) ) {
+            && SvIV(*temp) > 0 ) ) {
             SV* buffer;
 
             buffer = sv_2mortal(newSVsv(id));
@@ -529,7 +499,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
             }
             sv_catpv( buffer, ".\n Use the constants exported by Params::Validate to declare types." );
 
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
 
         SvGETMAGIC(*temp);
@@ -551,7 +521,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
             sv_catpv(buffer, "', which is not one of the allowed types: ");
             sv_catsv(buffer, allowed);
             sv_catpv(buffer, "\n");
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
     }
 
@@ -651,7 +621,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
                         sv_catpv(buffer, " did not pass the '");
                         sv_catsv(buffer, HeSVKEY_force(he));
                         sv_catpv(buffer, "' callback\n");
-                        FAIL(buffer, options);
+                        validation_failure(buffer, options);
                     }
                 }
                 else {
@@ -662,7 +632,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
                     sv_catpv(buffer, "' for ");
                     sv_catsv(buffer, get_called(options));
                     sv_catpv(buffer, " is not a subroutine reference\n");
-                    FAIL(buffer, options);
+                    validation_failure(buffer, options);
                 }
             }
         }
@@ -672,7 +642,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
             buffer = sv_2mortal(newSVpv("'callbacks' validation parameter for '", 0));
             sv_catsv(buffer, get_called(options));
             sv_catpv(buffer, " must be a hash reference\n");
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
     }
 
@@ -708,7 +678,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
             buffer = sv_2mortal(newSVpv("'regex' validation parameter for '", 0));
             sv_catsv(buffer, get_called(options));
             sv_catpv(buffer, " must be a string or qr// regex\n");
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
 
         PUSHMARK(SP);
@@ -728,7 +698,7 @@ validate_one_param(SV* value, SV* params, HV* spec, SV* id, HV* options, IV* unt
             sv_catpv(buffer, " to ");
             sv_catsv(buffer, get_called(options));
             sv_catpv(buffer, " did not pass regex check\n");
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
     }
 
@@ -771,7 +741,7 @@ convert_array2hash(AV* in, HV* options, HV* out) {
         sv_catsv(buffer, get_called(options));
         sv_catpv(buffer, " when named parameters were expected\n");
 
-        FAIL(buffer, options);
+        validation_failure(buffer, options);
     }
 
     for(i = 0; i <= av_len(in); i += 2) {
@@ -805,16 +775,11 @@ get_options(HV* options) {
     HV* ret;
     SV** temp;
     char* pkg;
-    #if (PERL_VERSION != 6)
     SV* buffer;
     SV* caller;
-    #endif
 
     ret = (HV*) sv_2mortal((SV*) newHV());
 
-    #if (PERL_VERSION == 6)
-    pkg = SvPV_nolen(get_sv("Params::Validate::CALLER", 0));
-    #else
     buffer = sv_2mortal(newSVpv("caller(0)", 0));
     SvTAINTED_off(buffer);
 
@@ -825,7 +790,7 @@ get_options(HV* options) {
     else {
         pkg = SvPV_nolen(caller);
     }
-    #endif
+
     /* get package specific options */
     OPTIONS = get_hv("Params::Validate::OPTIONS", 1);
     if ((temp = hv_fetch(OPTIONS, pkg, strlen(pkg), 0))) {
@@ -964,7 +929,7 @@ validate_pos_depends(AV* p, AV* specs, HV* options) {
                     (int) p_idx + 1,
                     (int) SvIV(*depends)));
 
-                FAIL(buffer, options);
+                validation_failure(buffer, options);
             }
         }
     }
@@ -1050,7 +1015,7 @@ validate_named_depends(HV* p, HV* specs, HV* options) {
                         sv_catpv(buffer, "' depends on parameter '");
                         sv_catsv(buffer, depend_name);
                         sv_catpv(buffer, "', which was not given");
-                        FAIL(buffer, options);
+                        validation_failure(buffer, options);
                     }
                 }
             }
@@ -1276,7 +1241,7 @@ validate(HV* p, HV* specs, HV* options, HV* ret) {
             }
             sv_catpv(buffer, "\n");
 
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
     }
 
@@ -1309,7 +1274,7 @@ validate(HV* p, HV* specs, HV* options, HV* ret) {
         sv_catsv(buffer, get_called(options));
         sv_catpv(buffer, "\n");
 
-        FAIL(buffer, options);
+        validation_failure(buffer, options);
     }
 
     if (GIMME_V != G_VOID) {
@@ -1504,7 +1469,7 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret) {
 
                 buffer = validate_pos_failure(av_len(p), min, av_len(specs), options);
 
-                FAIL(buffer, options);
+                validation_failure(buffer, options);
             }
         }
     }
@@ -1536,7 +1501,7 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret) {
 
             buffer = validate_pos_failure(av_len(p), min, av_len(specs), options);
 
-            FAIL(buffer, options);
+            validation_failure(buffer, options);
         }
     }
 
