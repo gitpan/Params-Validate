@@ -14,24 +14,24 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 56ea538a792e87973af3105df79e87fd33ccf936 Build.PL
-SHA1 65bff4ffc36ba63ca8321efe82e5437eb5d3b4e0 Changes
+SHA1 f527b700aa1ae188581163dee82a39c161267513 Build.PL
+SHA1 d76a97aeef6d6daa534715e468785cae69356c29 Changes
 SHA1 5c079fd98dd3d3f0a7148234631ca3b30f9d2a80 INSTALL
 SHA1 7e9ec08bb3a11d084050d04bac566e882b8b839d LICENSE
 SHA1 3ac54ccbee3e742c2c17fb79bbceb27a78ef1e63 MANIFEST
-SHA1 9b6fa2847e36df5ece2295ed17ff583c2f170ab9 META.json
-SHA1 ca63cfd005afa79d26240f5d1daed05a0ffbf8ff META.yml
-SHA1 306f73db6e25931b17aaeb9b876e33420aa5c47f README
+SHA1 1f807dab5e5e7762d87c86cce64d14609d62137c META.json
+SHA1 517cd84a013059ab028e542e18ed3435add571c4 META.yml
+SHA1 b9d07051fcc52a6dded71d5876b10b63459c1693 README
 SHA1 f63714390d38bc4e1a6769fc8cb3f6ce796c2ffb TODO
 SHA1 c5e1df5ee5feb3f35175c3cdc45dbe89e15276f5 benchmarks/basic
 SHA1 847ddd74867e960646b4c166ab42047db4f9a1c4 c/ppport.h
-SHA1 4883cc339595e793d06340b1cf7c366b8cb03de6 dist.ini
+SHA1 e6c633f13c24a61efe6d95acb88fb788ca3c6a20 dist.ini
 SHA1 2d1f339f1a2ceb22c2657d7c21983f69bc7456e3 inc/MyModuleBuild.pm
-SHA1 9794580a7447c0fd801a6db3859834607aef7f4c lib/Attribute/Params/Validate.pm
-SHA1 d0fb707c9ab61ec5ebcb393e5fb29d1228f43d40 lib/Params/Validate.pm
-SHA1 9f38ac15de8bc3363ecaadfa84b29b0a4ae2b00f lib/Params/Validate.xs
-SHA1 aaf9bb96473f4a69968f8974ce76544e8a9b18bc lib/Params/ValidatePP.pm
-SHA1 66ce113fb021772913964431a705cdbda7541a27 lib/Params/ValidateXS.pm
+SHA1 ce4c0e6403ebead2bf92dfa6e6de24c000662c79 lib/Attribute/Params/Validate.pm
+SHA1 045f96edb7aa732ba3e81b23d1b629215664be50 lib/Params/Validate.pm
+SHA1 88cd2e98fd006d67b284fad730b439fcef09e064 lib/Params/Validate.xs
+SHA1 5bd85e647bd168f7453bc72ac7b983dc1d17b79d lib/Params/ValidatePP.pm
+SHA1 c125b6e2ae71e5c3b559b4a3e9eb58fe84ee1ba2 lib/Params/ValidateXS.pm
 SHA1 9dbb8db7b99554555bbbcfb5ae1c562a80cf54bc t/01-validate.t
 SHA1 e7c75a0e962e40b669e6f48cc6e1eec6e6aa4edf t/02-noop.t
 SHA1 6d8bf111ea87f5119ae2f96c46a5fda5ddc09202 t/03-attribute.t
@@ -61,7 +61,7 @@ SHA1 ff15a9b080d2768bf39bcbc23aad52ebe9e36de2 t/27-string-as-type.t
 SHA1 5ecfa487288af372926a2db6faec816a128496be t/28-readonly-return.t
 SHA1 479dc89fe42aeb57830a74f79cf546ec6365e4a4 t/29-taint-mode.t
 SHA1 3a7a19225d6a3d7b271099d37e03eb04c53c3c5a t/30-hashref-alteration.t
-SHA1 eccb171b24a8447bb4618899d700b66f9b75b075 t/31-incorrect-spelling.t
+SHA1 a525d0ab36be380e84d2b0eb8f8b2bd367dda46e t/31-incorrect-spelling.t
 SHA1 4bb9fedb88c152bdda3546f07415432be2e4e1f8 t/lib/PVTests.pm
 SHA1 e44bf58b862952618ee21344c1368b3f9d573b61 t/lib/PVTests/Callbacks.pm
 SHA1 56a308a328ea841e0b5cdfee9dafae92f982239f t/lib/PVTests/Defaults.pm
@@ -103,11 +103,11 @@ SHA1 107dd49c858204105da5fe33493e89922087a731 t/release-pp-27-string-as-type.t
 SHA1 9098531dc80150ef15343f7abb5edc359a6ce253 t/release-pp-28-readonly-return.t
 SHA1 4797b4cba42f8e0103ea35e150fa833d6a9f58e7 t/release-pp-29-taint-mode.t
 SHA1 2cff8f29291b4dbf679b7598401aef88c884c75b t/release-pp-30-hashref-alteration.t
-SHA1 309c7199b7fbce1dfcb0fd02673685141aace1b3 t/release-pp-31-incorrect-spelling.t
+SHA1 bd5a44726f769b3a551c8cafe41261a8b4ccc9a2 t/release-pp-31-incorrect-spelling.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.10 (GNU/Linux)
 
-iEYEARECAAYFAk2t4lkACgkQIgMCsV8qvRIWOQCeL0/ntfP3pU/KcSNWV1r9A/Dk
-vLMAn1usYMDaeynvxHha8QpfCzjax3Lr
-=Ghdq
+iEYEARECAAYFAk2uOHUACgkQIgMCsV8qvRJQHwCfafS+fbc4vy/FACghIscrVJAf
+dJgAoI1IBc2yyKDLoGbDdVKsAMpQ+zJn
+=0LW+
 -----END PGP SIGNATURE-----

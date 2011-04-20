@@ -1,6 +1,6 @@
 package Attribute::Params::Validate;
 BEGIN {
-  $Attribute::Params::Validate::VERSION = '0.96';
+  $Attribute::Params::Validate::VERSION = '0.97';
 }
 
 use strict;

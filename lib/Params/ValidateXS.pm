@@ -1,6 +1,6 @@
 package Params::Validate;
 BEGIN {
-  $Params::Validate::VERSION = '0.96';
+  $Params::Validate::VERSION = '0.97';
 }
 
 use strict;
@@ -68,7 +68,7 @@ Params::Validate - XS implementation of Params::Validate
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 

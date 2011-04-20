@@ -1,6 +1,6 @@
 package Params::Validate;
 BEGIN {
-  $Params::Validate::VERSION = '0.96';
+  $Params::Validate::VERSION = '0.97';
 }
 
 use strict;
@@ -459,12 +459,12 @@ my %Valid = map { $_ => 1 }
 sub _validate_one_param {
     my ( $value, $params, $spec, $id ) = @_;
 
-    for my $key ( keys %{$spec} ) {
-        unless ( $Valid{$key} ) {
-            $options->{on_fail}
-                ->(qq{"$key" is not an allowed validation spec key});
-        }
-    }
+    # for my $key ( keys %{$spec} ) {
+    #     unless ( $Valid{$key} ) {
+    #         $options->{on_fail}
+    #             ->(qq{"$key" is not an allowed validation spec key});
+    #     }
+    # }
 
     if ( exists $spec->{type} ) {
         unless ( defined $spec->{type}
@@ -725,7 +725,7 @@ Params::Validate - pure Perl implementation of Params::Validate
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 
