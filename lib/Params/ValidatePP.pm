@@ -1,6 +1,6 @@
 package Params::Validate;
 BEGIN {
-  $Params::Validate::VERSION = '0.97';
+  $Params::Validate::VERSION = '0.98';
 }
 
 use strict;
@@ -725,7 +725,7 @@ Params::Validate - pure Perl implementation of Params::Validate
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 SYNOPSIS
 
