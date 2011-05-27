@@ -1,7 +1,13 @@
+0.99    2011-05-27
+
+- The metadata file - META.{json,yml} - had references to a different distro
+  because of a copy and paste error. Reported by Bernhad Graf. RT #68514.
+
+
 0.98    2011-04-23
 
 - Attribute::Params::Validate's $VERSION regressed in 0.96. It now manually
-  set to 1.07.
+  set to 1.07. Reported by tokuhirom. RT #67715.
 
 
 0.97    2011-04-19

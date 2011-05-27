@@ -19,7 +19,7 @@ my %module_build_args = (
     'Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>'
   ],
   'dist_name' => 'Params-Validate',
-  'dist_version' => '0.98',
+  'dist_version' => '0.99',
   'license' => 'artistic_2',
   'module_name' => 'Params::Validate',
   'recommends' => {},
