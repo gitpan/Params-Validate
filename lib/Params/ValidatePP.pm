@@ -1,7 +1,4 @@
 package Params::Validate;
-BEGIN {
-  $Params::Validate::VERSION = '0.99';
-}
 
 use strict;
 use warnings;
@@ -712,44 +709,3 @@ sub _get_called {
 }
 
 1;
-
-# ABSTRACT: pure Perl implementation of Params::Validate
-
-
-
-=pod
-
-=head1 NAME
-
-Params::Validate - pure Perl implementation of Params::Validate
-
-=head1 VERSION
-
-version 0.99
-
-=head1 SYNOPSIS
-
-  See Params::Validate
-
-=head1 DESCRIPTION
-
-This is a pure Perl implementation of Params::Validate.  See the
-Params::Validate documentation for details.
-
-=head1 AUTHOR
-
-Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2011 by Dave Rolsky and Ilya Martynov.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut
-
-
-__END__
-
