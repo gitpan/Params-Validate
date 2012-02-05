@@ -3,12 +3,19 @@ abstract: 'Validate method/function parameters'
 author:
   - 'Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>'
 build_requires:
+  Devel::Peek: 0
+  File::Spec: 0
+  File::Temp: 0
   Module::Build: 0.3601
   Test::More: 0.88
+  Tie::Array: 0
+  Tie::Hash: 0
+  base: 0
+  overload: 0
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,9 +23,16 @@ meta-spec:
 name: Params-Validate
 requires:
   Attribute::Handlers: 0.79
+  Carp: 0
+  Exporter: 0
   Scalar::Util: 1.10
-  perl: v5.8.1
+  XSLoader: 0
+  attributes: 0
+  perl: 5.008001
+  strict: 0
+  vars: 0
+  warnings: 0
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Validate
   repository: git://git.urth.org/Params-Validate.git
-version: 1.00
+version: 1.01

@@ -1,6 +1,6 @@
 package Params::Validate;
-BEGIN {
-  $Params::Validate::VERSION = '1.00';
+{
+  $Params::Validate::VERSION = '1.01';
 }
 
 use 5.008001;
@@ -60,7 +60,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -773,8 +773,6 @@ via email at bug-params-validate@rt.cpan.org.
 
 Support questions can be sent to Dave at autarch@urth.org.
 
-The code repository is at http://hg.urth.org/hg/Params-Validate
-
 =head1 DONATIONS
 
 If you'd like to thank me for the work I've done on this module,
@@ -802,7 +800,7 @@ Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2012 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 

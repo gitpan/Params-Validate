@@ -4,7 +4,7 @@
       "Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
    "license" : [
       "artistic_2"
    ],
@@ -27,13 +27,27 @@
       "runtime" : {
          "requires" : {
             "Attribute::Handlers" : "0.79",
+            "Carp" : 0,
+            "Exporter" : 0,
             "Scalar::Util" : "1.10",
-            "perl" : "v5.8.1"
+            "XSLoader" : 0,
+            "attributes" : 0,
+            "perl" : "5.008001",
+            "strict" : 0,
+            "vars" : 0,
+            "warnings" : 0
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Devel::Peek" : 0,
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88",
+            "Tie::Array" : 0,
+            "Tie::Hash" : 0,
+            "base" : 0,
+            "overload" : 0
          }
       }
    },
@@ -49,6 +63,6 @@
          "web" : "http://git.urth.org/Params-Validate.git"
       }
    },
-   "version" : "1.00"
+   "version" : "1.01"
 }
 

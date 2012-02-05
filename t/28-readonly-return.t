@@ -2,15 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    eval 'use File::Temp';
-    if ($@) {
-        plan skip_all => 'Need File::Temp for this test';
-    }
-    else {
-            }
-}
-
 use Devel::Peek qw( SvREFCNT );
 use File::Temp qw( tempfile );
 use Params::Validate qw( validate SCALAR HANDLE );

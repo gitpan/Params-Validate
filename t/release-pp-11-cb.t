@@ -7,7 +7,7 @@ BEGIN {
         plan skip_all => 'these tests are for testing by the release';
     }
 
-    $ENV{PERL_TEST_PV} = 1;
+    $ENV{PV_TEST_PERL} = 1;
 }
 
 use strict;

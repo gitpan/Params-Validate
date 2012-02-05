@@ -7,21 +7,12 @@ BEGIN {
         plan skip_all => 'these tests are for testing by the release';
     }
 
-    $ENV{PERL_TEST_PV} = 1;
+    $ENV{PV_TEST_PERL} = 1;
 }
 
 use strict;
 use warnings;
 use Test::More;
-
-BEGIN {
-    eval 'use File::Temp';
-    if ($@) {
-        plan skip_all => 'Need File::Temp for this test';
-    }
-    else {
-            }
-}
 
 use Devel::Peek qw( SvREFCNT );
 use File::Temp qw( tempfile );
