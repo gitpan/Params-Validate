@@ -13,6 +13,7 @@ dist.ini
 inc/MyModuleBuild.pm
 lib/Attribute/Params/Validate.pm
 lib/Params/Validate.pm
+lib/Params/Validate/Constants.pm
 lib/Params/Validate/PP.pm
 lib/Params/Validate/XS.pm
 lib/Params/Validate/XS.xs

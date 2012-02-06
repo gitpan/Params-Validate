@@ -29,10 +29,8 @@
             "Attribute::Handlers" : "0.79",
             "Carp" : 0,
             "Exporter" : 0,
-            "Module::Runtime" : "0.011",
-            "Package::Stash" : 0,
+            "Module::Implementation" : 0,
             "Scalar::Util" : "1.10",
-            "Try::Tiny" : 0,
             "XSLoader" : 0,
             "attributes" : 0,
             "perl" : "5.008001",
@@ -58,7 +56,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-chloro@rt.cpan.org",
+         "mailto" : "bug-params-validate@rt.cpan.org",
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Validate"
       },
       "repository" : {
@@ -67,6 +65,6 @@
          "web" : "http://git.urth.org/Params-Validate.git"
       }
    },
-   "version" : "1.02"
+   "version" : "1.03"
 }
 
