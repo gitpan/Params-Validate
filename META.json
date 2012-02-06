@@ -29,7 +29,10 @@
             "Attribute::Handlers" : "0.79",
             "Carp" : 0,
             "Exporter" : 0,
+            "Module::Runtime" : "0.011",
+            "Package::Stash" : 0,
             "Scalar::Util" : "1.10",
+            "Try::Tiny" : 0,
             "XSLoader" : 0,
             "attributes" : 0,
             "perl" : "5.008001",
@@ -43,6 +46,7 @@
             "Devel::Peek" : 0,
             "File::Spec" : 0,
             "File::Temp" : 0,
+            "Test::Fatal" : 0,
             "Test::More" : "0.88",
             "Tie::Array" : 0,
             "Tie::Hash" : 0,
@@ -63,6 +67,6 @@
          "web" : "http://git.urth.org/Params-Validate.git"
       }
    },
-   "version" : "1.01"
+   "version" : "1.02"
 }
 

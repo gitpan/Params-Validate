@@ -13,7 +13,9 @@ dist.ini
 inc/MyModuleBuild.pm
 lib/Attribute/Params/Validate.pm
 lib/Params/Validate.pm
-lib/Params/Validate.xs
+lib/Params/Validate/PP.pm
+lib/Params/Validate/XS.pm
+lib/Params/Validate/XS.xs
 lib/Params/ValidatePP.pm
 lib/Params/ValidateXS.pm
 sanexs.c
@@ -47,6 +49,7 @@ t/28-readonly-return.t
 t/29-taint-mode.t
 t/30-hashref-alteration.t
 t/31-incorrect-spelling.t
+t/32-regex-as-value.t
 t/lib/PVTests.pm
 t/lib/PVTests/Callbacks.pm
 t/lib/PVTests/Defaults.pm
@@ -91,3 +94,6 @@ t/release-pp-28-readonly-return.t
 t/release-pp-29-taint-mode.t
 t/release-pp-30-hashref-alteration.t
 t/release-pp-31-incorrect-spelling.t
+t/release-pp-32-regex-as-value.t
+t/release-pp-is-loaded.t
+t/release-xs-is-loaded.t

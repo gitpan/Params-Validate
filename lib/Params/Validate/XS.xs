@@ -1512,13 +1512,13 @@ validate_pos(AV* p, AV* specs, HV* options, AV* ret) {
 }
 
 
-MODULE = Params::Validate               PACKAGE = Params::Validate
+MODULE = Params::Validate::XS    PACKAGE = Params::Validate::XS
 
 BOOT:
     bootinit();
 
 void
-_validate(p, specs)
+validate(p, specs)
     SV* p
     SV* specs
 
@@ -1577,7 +1577,7 @@ _validate(p, specs)
     RETURN_HASH(ret);
 
 void
-_validate_pos(p, ...)
+validate_pos(p, ...)
 SV* p
 
     PROTOTYPE: \@@
@@ -1622,7 +1622,7 @@ SV* p
     RETURN_ARRAY(ret);
 
 void
-_validate_with(...)
+validate_with(...)
 
     PPCODE:
 

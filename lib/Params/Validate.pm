@@ -1,6 +1,6 @@
 package Params::Validate;
 {
-  $Params::Validate::VERSION = '1.01';
+  $Params::Validate::VERSION = '1.02';
 }
 
 use 5.008001;
@@ -8,11 +8,14 @@ use 5.008001;
 use strict;
 use warnings;
 
+use Exporter;
+use Module::Runtime 0.011 qw( require_module );
+use Package::Stash;
+use Try::Tiny;
+
+use vars qw( $NO_VALIDATION %OPTIONS $options $IMPLEMENTATION );
+
 BEGIN {
-    use Exporter;
-
-    use vars qw( $NO_VALIDATION %OPTIONS $options );
-
     our @ISA = 'Exporter';
 
     my %tags = (
@@ -35,14 +38,65 @@ BEGIN {
 
     $NO_VALIDATION = $ENV{PERL_NO_VALIDATION};
 
-    my $e = do {
-        local $@;
-        eval { require Params::ValidateXS; } unless $ENV{PV_TEST_PERL};
-        $@;
-    };
+    our $IMPLEMENTATION;
 
-    if ( $e || $ENV{PV_TEST_PERL} ) {
-        require Params::ValidatePP;
+    $IMPLEMENTATION = $ENV{PARAMS_VALIDATE_IMPLEMENTATION}
+        if exists $ENV{PARAMS_VALIDATE_IMPLEMENTATION};
+
+    $IMPLEMENTATION = 'PP' if $ENV{PV_TEST_PERL};
+
+    my $module;
+    my $err;
+    if ($IMPLEMENTATION) {
+        die "Invalid implementation requested: $IMPLEMENTATION"
+            unless $IMPLEMENTATION =~ /^(?:XS|PP)$/;
+
+        $module = "Params::Validate::$IMPLEMENTATION";
+        # Need to untaint this variable
+        ($module) = $module =~ /^(.+)$/;
+        try {
+            require_module($module);
+        }
+        catch {
+            require Carp;
+            Carp::croak(
+                "Could not load $module: $_");
+        };
+    }
+    else {
+        for my $impl ( 'XS', 'PP' ) {
+            try {
+                $module = "Params::Validate::$impl";
+                require_module($module);
+                $IMPLEMENTATION = $impl;
+            }
+            catch {
+                warn $_ if $ENV{PV_WARN_FAILED_IMPLEMENTATION};
+                $err .= $_;
+            };
+
+            last if $IMPLEMENTATION;
+        }
+    }
+
+    if ( !$IMPLEMENTATION ) {
+        require Carp;
+        Carp::croak(
+            "Could not find a suitable Params::Validate implementation: $err"
+        );
+    }
+
+    my $this_stash = Package::Stash->new(__PACKAGE__);
+    # Under taint mode, "$module" and $module are somehow not the same
+    # thing. I love taint mode.
+    my $impl_stash = Package::Stash->new("$module");
+
+    for my $sym ( $impl_stash->list_all_symbols('CODE') ) {
+        $this_stash->add_symbol( '&' . $sym => $module->can($sym) );
+    }
+
+    sub _implementation {
+        return $IMPLEMENTATION;
     }
 }
 
@@ -60,7 +114,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
