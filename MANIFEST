@@ -19,7 +19,6 @@ lib/Params/Validate/XS.pm
 lib/Params/Validate/XS.xs
 lib/Params/ValidatePP.pm
 lib/Params/ValidateXS.pm
-sanexs.c
 t/01-validate.t
 t/02-noop.t
 t/03-attribute.t

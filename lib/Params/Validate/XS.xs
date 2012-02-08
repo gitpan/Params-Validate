@@ -1,4 +1,4 @@
-/* Copyright (c) 2000-2011 Dave Rolsky */
+/* Copyright (c) 2000-2012 Dave Rolsky and Ilya Martynov */
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -439,11 +439,6 @@ validate_can(SV* value, SV* method, SV* id, HV* options) {
 
     return 1;
 }
-
-#define VALID_KEY_COUNT 9
-static char* valid_keys[VALID_KEY_COUNT] = {
-  "callbacks", "can", "default", "depends", "isa", "optional", "regex", "type", "untaint"
-};
 
 /* validates specific parameter using supplied parameter specification */
 static IV
