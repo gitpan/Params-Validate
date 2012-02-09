@@ -5,8 +5,18 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+MYMETA.json
 README
 TODO
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
 benchmarks/basic
 c/ppport.h
 dist.ini
@@ -97,3 +107,4 @@ t/release-pp-31-incorrect-spelling.t
 t/release-pp-32-regex-as-value.t
 t/release-pp-is-loaded.t
 t/release-xs-is-loaded.t
+t/release-xs-segfault.t
