@@ -1,3 +1,9 @@
+1.06    2012-02-10
+
+- Shut up warnings when XS is loaded on older 5.8.x Perl versions. Reported by
+  Aaron James Trevena. RT #74742.
+
+
 1.05    2012-02-08
 
 - The XS code had a code path where it could pass the contents of a Perl

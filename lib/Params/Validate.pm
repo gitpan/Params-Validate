@@ -1,6 +1,6 @@
 package Params::Validate;
 {
-  $Params::Validate::VERSION = '1.05';
+  $Params::Validate::VERSION = '1.06';
 }
 
 use 5.008001;
@@ -80,7 +80,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
