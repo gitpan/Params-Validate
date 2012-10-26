@@ -1,6 +1,6 @@
 package Params::Validate;
 {
-  $Params::Validate::VERSION = '1.06';
+  $Params::Validate::VERSION = '1.07';
 }
 
 use 5.008001;
@@ -80,7 +80,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -579,7 +579,7 @@ You can also use the C<state> feature to do this:
     use feature 'state';
 
     sub foo {
-        state %spec = ( ... );
+        state $spec = { ... };
         my %params = validate( @_, \%spec );
     }
 

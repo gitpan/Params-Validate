@@ -11,7 +11,6 @@ my %module_build_args = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Module::Build" => "0.3601",
-    "Module::Implementation" => "0.04",
     "Test::Fatal" => 0,
     "Test::More" => "0.88",
     "Tie::Array" => 0,
@@ -28,7 +27,7 @@ my %module_build_args = (
     "Dave Rolsky, <autarch\@urth.org> and Ilya Martynov <ilya\@martynov.org>"
   ],
   "dist_name" => "Params-Validate",
-  "dist_version" => "1.06",
+  "dist_version" => "1.07",
   "license" => "artistic_2",
   "module_name" => "Params::Validate",
   "recommends" => {},

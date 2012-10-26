@@ -1,4 +1,7 @@
 package Attribute::Params::Validate;
+{
+  $Attribute::Params::Validate::VERSION = '1.07';
+}
 
 use strict;
 use warnings;
@@ -11,8 +14,6 @@ use Attribute::Handlers 0.79;
 use Params::Validate qw(:all);
 
 require Exporter;
-
-our $VERSION = 1.07;
 
 our @ISA = qw(Exporter);
 

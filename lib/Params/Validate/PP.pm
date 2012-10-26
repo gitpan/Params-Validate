@@ -1,4 +1,7 @@
 package Params::Validate::PP;
+{
+  $Params::Validate::PP::VERSION = '1.07';
+}
 
 use strict;
 use warnings;
@@ -43,7 +46,7 @@ sub validate_pos (\@@) {
 
         # if the spec is bigger that's where we can start adding
         # defaults
-        for ( my $x = $#p + 1; $x <= $#specs; $x++ ) {
+        for ( my $x = $#p + 1 ; $x <= $#specs ; $x++ ) {
             $p[$x] = $specs[$x]->{default}
                 if ref $specs[$x] && exists $specs[$x]->{default};
         }
@@ -98,8 +101,10 @@ sub validate_pos (\@@) {
 
         if ( $_ <= $#p ) {
             my $value = defined $p[$_] ? qq|"$p[$_]"| : 'undef';
-            _validate_one_param( $p[$_], \@p, $spec,
-                "Parameter #" . ( $_ + 1 ) . " ($value)" );
+            _validate_one_param(
+                $p[$_], \@p, $spec,
+                "Parameter #" . ( $_ + 1 ) . " ($value)"
+            );
         }
 
         $p[$_] = $spec->{default} if $_ > $#p && exists $spec->{default};
@@ -129,8 +134,8 @@ sub _validate_pos_depends {
 
         next
             unless $spec
-                && UNIVERSAL::isa( $spec, 'HASH' )
-                && exists $spec->{depends};
+            && UNIVERSAL::isa( $spec, 'HASH' )
+            && exists $spec->{depends};
 
         my $depends = $spec->{depends};
 
@@ -164,8 +169,8 @@ sub _validate_named_depends {
 
         next
             unless $spec
-                && UNIVERSAL::isa( $spec, 'HASH' )
-                && $spec->{depends};
+            && UNIVERSAL::isa( $spec, 'HASH' )
+            && $spec->{depends};
 
         unless ( UNIVERSAL::isa( $spec->{depends}, 'ARRAY' )
             || !ref $spec->{depends} ) {
@@ -237,7 +242,8 @@ sub validate (\@$) {
                 (
                     map { $_ => $specs->{$_}->{default} }
                         grep {
-                        ref $specs->{$_} && exists $specs->{$_}->{default}
+                        ref $specs->{$_}
+                            && exists $specs->{$_}->{default}
                         }
                         keys %$specs
                 ),
@@ -333,15 +339,17 @@ OUTER:
         # absence of the parameter.
         elsif ( ref $spec ) {
             my $value = defined $p->{$key} ? qq|"$p->{$key}"| : 'undef';
-            _validate_one_param( $p->{$key}, $p, $spec,
-                "The '$key' parameter ($value)" );
+            _validate_one_param(
+                $p->{$key}, $p, $spec,
+                "The '$key' parameter ($value)"
+            );
         }
     }
 
     if (@missing) {
         my $called = _get_called();
 
-        my $missing = join ', ', map {"'$_'"} @missing;
+        my $missing = join ', ', map { "'$_'" } @missing;
         $options->{on_fail}->( "Mandatory parameter"
                 . ( @missing > 1 ? 's' : '' )
                 . " $missing missing in call to $called\n" );
