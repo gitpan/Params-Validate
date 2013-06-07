@@ -1,6 +1,6 @@
 package Attribute::Params::Validate;
 {
-  $Attribute::Params::Validate::VERSION = '1.07';
+  $Attribute::Params::Validate::VERSION = '1.08';
 }
 
 use strict;
@@ -89,6 +89,20 @@ EOF
 
 1;
 
+# ABSTRACT: Define validation through subroutine attributes
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Attribute::Params::Validate - Define validation through subroutine attributes
+
+=head1 VERSION
+
+version 1.08
+
 =head1 SYNOPSIS
 
   use Attribute::Params::Validate qw(:all);
@@ -120,7 +134,6 @@ EOF
   }
 
 =head1 DESCRIPTION
-
 
 The Attribute::Params::Validate module allows you to validate method
 or function call parameters just like Params::Validate does.  However,
@@ -171,5 +184,16 @@ attribute on a single line, or Perl will complain.
 
 Params::Validate
 
-=cut
+=head1 AUTHOR
 
+Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Dave Rolsky and Ilya Martynov.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

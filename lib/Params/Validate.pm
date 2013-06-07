@@ -1,6 +1,6 @@
 package Params::Validate;
 {
-  $Params::Validate::VERSION = '1.07';
+  $Params::Validate::VERSION = '1.08';
 }
 
 use 5.008001;
@@ -70,7 +70,7 @@ $NO_VALIDATION = $ENV{PERL_NO_VALIDATION};
 
 # ABSTRACT: Validate method/function parameters
 
-
+__END__
 
 =pod
 
@@ -80,7 +80,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -580,7 +580,7 @@ You can also use the C<state> feature to do this:
 
     sub foo {
         state $spec = { ... };
-        my %params = validate( @_, \%spec );
+        my %params = validate( @_, $spec );
     }
 
 =head1 "GLOBAL" OPTIONS
@@ -820,14 +820,10 @@ Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2013 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-
-__END__
-

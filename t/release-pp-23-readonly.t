@@ -21,8 +21,6 @@ BEGIN {
     if ( $@ || !defined $Readonly::XS::VERSION ) {
         plan skip_all => 'Need Readonly::XS and Readonly for this test';
     }
-    else {
-            }
 }
 
 {

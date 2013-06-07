@@ -7,16 +7,7 @@ use Module::Build 0.3601;
 
 my %module_build_args = (
   "build_requires" => {
-    "Devel::Peek" => 0,
-    "File::Spec" => 0,
-    "File::Temp" => 0,
-    "Module::Build" => "0.3601",
-    "Test::Fatal" => 0,
-    "Test::More" => "0.88",
-    "Tie::Array" => 0,
-    "Tie::Hash" => 0,
-    "base" => 0,
-    "overload" => 0
+    "Module::Build" => "0.3601"
   },
   "c_source" => "c",
   "configure_requires" => {
@@ -27,7 +18,7 @@ my %module_build_args = (
     "Dave Rolsky, <autarch\@urth.org> and Ilya Martynov <ilya\@martynov.org>"
   ],
   "dist_name" => "Params-Validate",
-  "dist_version" => "1.07",
+  "dist_version" => "1.08",
   "license" => "artistic_2",
   "module_name" => "Params::Validate",
   "recommends" => {},
@@ -45,9 +36,33 @@ my %module_build_args = (
     "vars" => 0,
     "warnings" => 0
   },
-  "script_files" => []
+  "script_files" => [],
+  "test_requires" => {
+    "Devel::Peek" => 0,
+    "File::Spec" => 0,
+    "File::Temp" => 0,
+    "Test::Fatal" => 0,
+    "Test::More" => "0.88",
+    "Tie::Array" => 0,
+    "Tie::Hash" => 0,
+    "base" => 0,
+    "overload" => 0
+  }
 );
 
+
+unless ( eval { Module::Build->VERSION(0.4004) } ) {
+  my $tr = delete $module_build_args{test_requires};
+  my $br = $module_build_args{build_requires};
+  for my $mod ( keys %$tr ) {
+    if ( exists $br->{$mod} ) {
+      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
+    }
+    else {
+      $br->{$mod} = $tr->{$mod};
+    }
+  }
+}
 
 my $build = Module::Build->new(%module_build_args);
 

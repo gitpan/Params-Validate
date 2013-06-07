@@ -7,6 +7,15 @@ META.json
 META.yml
 README
 TODO
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
 benchmarks/basic
 c/ppport.h
 dist.ini
@@ -52,6 +61,7 @@ t/31-incorrect-spelling.t
 t/32-regex-as-value.t
 t/33-keep-errsv.t
 t/34-recursive-validation.t
+t/35-default-xs-bug.t
 t/lib/PVTests.pm
 t/lib/PVTests/Callbacks.pm
 t/lib/PVTests/Defaults.pm
@@ -99,6 +109,7 @@ t/release-pp-31-incorrect-spelling.t
 t/release-pp-32-regex-as-value.t
 t/release-pp-33-keep-errsv.t
 t/release-pp-34-recursive-validation.t
+t/release-pp-35-default-xs-bug.t
 t/release-pp-is-loaded.t
 t/release-xs-is-loaded.t
 t/release-xs-segfault.t

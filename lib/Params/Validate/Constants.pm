@@ -1,6 +1,6 @@
 package Params::Validate::Constants;
 {
-  $Params::Validate::Constants::VERSION = '1.07';
+  $Params::Validate::Constants::VERSION = '1.08';
 }
 
 use strict;
