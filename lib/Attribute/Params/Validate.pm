@@ -1,8 +1,5 @@
 package Attribute::Params::Validate;
-{
-  $Attribute::Params::Validate::VERSION = '1.08';
-}
-
+$Attribute::Params::Validate::VERSION = '1.09';
 use strict;
 use warnings;
 
@@ -101,7 +98,7 @@ Attribute::Params::Validate - Define validation through subroutine attributes
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -190,7 +187,7 @@ Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2014 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 

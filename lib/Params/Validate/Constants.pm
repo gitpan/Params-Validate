@@ -1,8 +1,5 @@
 package Params::Validate::Constants;
-{
-  $Params::Validate::Constants::VERSION = '1.08';
-}
-
+$Params::Validate::Constants::VERSION = '1.09';
 use strict;
 use warnings;
 

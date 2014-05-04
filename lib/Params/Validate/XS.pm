@@ -1,13 +1,11 @@
 package Params::Validate::XS;
-{
-  $Params::Validate::XS::VERSION = '1.08';
-}
-
+$Params::Validate::XS::VERSION = '1.09';
 use strict;
 use warnings;
 
+use Carp;
+
 my $default_fail = sub {
-    require Carp;
     Carp::confess( $_[0] );
 };
 

@@ -1,3 +1,22 @@
+1.09    2014-05-04
+
+- A call to validate() where the spec was a reference to a Readonly hash would
+  segfault. Reported by Salvatore Bonaccorso. RT #80572.
+
+- When using the XS implementation, attempting to validate parameters with
+  tainted values would cause an "Insecure dependency in eval_sv() while
+  running with -T switch" exception from Perl *if the validation failed*. This
+  is fixed, but only for Perl 5.14+. Older Perls do not include the necessary
+  XS API. RT #70174.
+
+- Fixed some potential segfaults from the XS implementation including the one
+  reported by Анатолий Гришаев in RT #50412. However, the XS code in general
+  is pretty crufty and tends to assume that values which could be NULL aren't.
+
+- Fixed bad example of state() in POD. Reported by Salvatore Bonaccorso. RT
+  #80250.
+
+
 1.08    2013-06-07
 
 - The handling of defaults in the XS version of validate_pos was broken. The
