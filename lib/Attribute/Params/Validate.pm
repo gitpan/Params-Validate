@@ -1,5 +1,5 @@
 package Attribute::Params::Validate;
-$Attribute::Params::Validate::VERSION = '1.09';
+$Attribute::Params::Validate::VERSION = '1.10';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ Attribute::Params::Validate - Define validation through subroutine attributes
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -181,9 +181,19 @@ attribute on a single line, or Perl will complain.
 
 Params::Validate
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
+=over 4
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Ilya Martynov <ilya@martynov.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

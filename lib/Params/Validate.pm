@@ -1,5 +1,5 @@
 package Params::Validate;
-$Params::Validate::VERSION = '1.09';
+$Params::Validate::VERSION = '1.10';
 use 5.008001;
 
 use strict;
@@ -77,7 +77,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -772,6 +772,14 @@ expect validation to be on when they execute.  For example:
 But if you want to shoot yourself in the foot and just turn it off, go
 ahead!
 
+=head1 TAINT MODE
+
+The XS implementation of this module has some problems Under taint mode with
+version of Perl before 5.14. If validation I<fails>, then instead of getting
+the expected error message you'll get a message like "Insecure dependency in
+eval_sv". This can be worked around by either untainting the arguments
+yourself, using the pure Perl implementation, or upgrading your Perl.
+
 =head1 LIMITATIONS
 
 Right now there is no way (short of a callback) to specify that
@@ -811,9 +819,19 @@ To donate, log into PayPal and send money to autarch@urth.org or use
 the button on this page:
 L<http://www.urth.org/~autarch/fs-donation.html>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Dave Rolsky, <autarch@urth.org> and Ilya Martynov <ilya@martynov.org>
+=over 4
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Ilya Martynov <ilya@martynov.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

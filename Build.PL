@@ -16,10 +16,11 @@ my %module_build_args = (
   },
   "dist_abstract" => "Validate method/function parameters",
   "dist_author" => [
-    "Dave Rolsky, <autarch\@urth.org> and Ilya Martynov <ilya\@martynov.org>"
+    "Dave Rolsky <autarch\@urth.org>",
+    "Ilya Martynov <ilya\@martynov.org>"
   ],
   "dist_name" => "Params-Validate",
-  "dist_version" => "1.09",
+  "dist_version" => "1.10",
   "license" => "artistic_2",
   "module_name" => "Params::Validate",
   "recommends" => {},
