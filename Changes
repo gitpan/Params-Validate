@@ -1,3 +1,8 @@
+1.11    2014-06-26
+
+- Fixes for MSVC compilation. Patch by J.R. Mash. PR #1.
+
+
 1.10    2014-05-11
 
 - Require Readonly 1.03+ and Scalar::Util 1.20 for testing with
