@@ -270,11 +270,14 @@ get_called(HV* options) {
         return *temp;
     }
     else {
+        IV frame;
+        SV *caller;
+#if PERL_VERSION > 14
     	const PERL_CONTEXT *cx;
         GV *cvgv;
-        IV frame;
+# else
         SV *buffer;
-        SV *caller;
+#endif
 
         if ((temp = hv_fetch(options, "stack_skip", 10, 0))) {
             SvGETMAGIC(*temp);
