@@ -13,8 +13,8 @@ do{ my $x = [
       'blib/script'
     ],
     'conflicts' => {},
-    'scripts' => undef,
     'recommends' => {},
+    'scripts' => undef,
     'pod_files' => undef,
     'config_dir' => '_build',
     'dist_version' => 42,
@@ -34,7 +34,7 @@ do{ my $x = [
     'xs_files' => undef,
     'destdir' => undef,
     'metafile' => 'META.yml',
-    'mb_version' => '0.4003',
+    'mb_version' => '0.38',
     'use_tap_harness' => 0,
     'test_file_exts' => [
       '.t'
@@ -45,11 +45,11 @@ do{ my $x = [
     'module_name' => 'Params::Validate',
     '_have_c_compiler' => 1,
     'recursive_test_files' => 1,
-    'perl' => '/home/autarch/perl5/perlbrew/perls/perl-5.16.3/bin/perl',
     'libdoc_dirs' => [
       'blib/lib',
       'blib/arch'
     ],
+    'perl' => '/home/autarch/perl5/perlbrew/perls/perl-5.14.2/bin/perl',
     'dist_author' => undef,
     'bundle_inc' => [],
     'use_rcfile' => 1,
@@ -87,10 +87,10 @@ do{ my $x = [
     'installdirs' => 'site',
     'mymetafile' => 'MYMETA.yml',
     'create_makefile_pl' => undef,
-    'magic_number' => undef,
     'dynamic_config' => 1,
-    'tap_harness_args' => {},
+    'magic_number' => undef,
     'install_sets' => {},
+    'tap_harness_args' => {},
     'install_base_relpaths' => {},
     'create_packlist' => 1,
     'meta_add' => {},

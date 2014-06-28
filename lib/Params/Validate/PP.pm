@@ -1,5 +1,5 @@
 package Params::Validate::PP;
-$Params::Validate::PP::VERSION = '1.12';
+$Params::Validate::PP::VERSION = '1.13';
 use strict;
 use warnings;
 
