@@ -1,3 +1,4 @@
+#!perl
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
@@ -6,11 +7,7 @@ BEGIN {
   }
 }
 
-use strict;
-use warnings;
-use Test::More;
 
-eval 'use Test::EOL';
-plan skip_all => 'Test::EOL required' if $@;
+use Test::Synopsis;
 
-all_perl_files_ok({ trailing_whitespace => 1 });
+all_synopsis_ok();

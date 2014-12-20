@@ -1,83 +1,12 @@
-package Params::Validate;
-# git description: v1.13-21-ge6e71db
-
-$Params::Validate::VERSION = '1.14'; # TRIAL
-use 5.008001;
-
-use strict;
-use warnings;
-
-use Exporter;
-use Module::Implementation;
-use Params::Validate::Constants;
-
-use vars qw( $NO_VALIDATION %OPTIONS $options );
-
-our @ISA = 'Exporter';
-
-my @types = qw(
-    SCALAR
-    ARRAYREF
-    HASHREF
-    CODEREF
-    GLOB
-    GLOBREF
-    SCALARREF
-    HANDLE
-    BOOLEAN
-    UNDEF
-    OBJECT
-);
-
-our %EXPORT_TAGS = (
-    'all' => [
-        qw( validate validate_pos validation_options validate_with ),
-        @types
-    ],
-    types => \@types,
-);
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
-our @EXPORT = qw( validate validate_pos );
-
-$NO_VALIDATION = $ENV{PERL_NO_VALIDATION};
-
-{
-    my $loader = Module::Implementation::build_loader_sub(
-        implementations => [ 'XS', 'PP' ],
-        symbols         => [
-            qw(
-                validate
-                validate_pos
-                validate_with
-                validation_options
-                set_options
-                ),
-        ],
-    );
-
-    $ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'PP' if $ENV{PV_TEST_PERL};
-
-    $loader->();
-}
-
-1;
-
-# ABSTRACT: Validate method/function parameters
-
-__END__
-
-=pod
-
-=head1 NAME
+# NAME
 
 Params::Validate - Validate method/function parameters
 
-=head1 VERSION
+# VERSION
 
 version 1.14
 
-=head1 SYNOPSIS
+# SYNOPSIS
 
     use Params::Validate qw(:all);
 
@@ -156,7 +85,7 @@ version 1.14
         );
     }
 
-=head1 DESCRIPTION
+# DESCRIPTION
 
 The Params::Validate module allows you to validate method or function
 call parameters to an arbitrary level of specificity. At the simplest
@@ -168,28 +97,26 @@ type, that it is an object of a certain class hierarchy, that it
 possesses certain methods, or applying validation callbacks to
 arguments.
 
-=head2 EXPORT
+## EXPORT
 
-The module always exports the C<validate()> and C<validate_pos()>
+The module always exports the `validate()` and `validate_pos()`
 functions.
 
 It also has an additional function available for export,
-C<validate_with>, which can be used to validate any type of
+`validate_with`, which can be used to validate any type of
 parameters, and set various options on a per-invocation basis.
 
 In addition, it can export the following constants, which are used as
-part of the type checking. These are C<SCALAR>, C<ARRAYREF>,
-C<HASHREF>, C<CODEREF>, C<GLOB>, C<GLOBREF>, and C<SCALARREF>,
-C<UNDEF>, C<OBJECT>, C<BOOLEAN>, and C<HANDLE>. These are explained
-in the section on L<Type Validation|Params::Validate/Type Validation>.
+part of the type checking. These are `SCALAR`, `ARRAYREF`,
+`HASHREF`, `CODEREF`, `GLOB`, `GLOBREF`, and `SCALARREF`,
+`UNDEF`, `OBJECT`, `BOOLEAN`, and `HANDLE`. These are explained
+in the section on [Type Validation](https://metacpan.org/pod/Params::Validate#Type-Validation).
 
-The constants are available via the export tag C<:types>. There is
-also an C<:all> tag which includes all of the constants as well as the
-C<validation_options()> function.
+The constants are available via the export tag `:types`. There is
+also an `:all` tag which includes all of the constants as well as the
+`validation_options()` function.
 
-=encoding UTF-8
-
-=head1 PARAMETER VALIDATION
+# PARAMETER VALIDATION
 
 The validation mechanisms provided by this module can handle both
 named or positional parameters. For the most part, the same features
@@ -201,7 +128,7 @@ checks fail.
 When handling named parameters, the module will accept either a hash
 or a hash reference.
 
-Subroutines expecting named parameters should call the C<validate()>
+Subroutines expecting named parameters should call the `validate()`
 subroutine like this:
 
     validate(
@@ -213,11 +140,11 @@ subroutine like this:
     );
 
 Subroutines expecting positional parameters should call the
-C<validate_pos()> subroutine like this:
+`validate_pos()` subroutine like this:
 
     validate_pos( @_, { validation spec }, { validation spec } );
 
-=head2 Mandatory/Optional Parameters
+## Mandatory/Optional Parameters
 
 If you just want to specify that some parameters are mandatory and
 others are optional, this can be done very simply.
@@ -254,74 +181,70 @@ end of the validation specification.
 In addition, if you specify that a parameter can have a default, then
 it is considered optional.
 
-=head2 Type Validation
+## Type Validation
 
 This module supports the following simple types, which can be
-L<exported as constants|/EXPORT>:
+[exported as constants](#export):
 
-=over 4
+- SCALAR
 
-=item * SCALAR
+    A scalar which is not a reference, such as `10` or `'hello'`. A
+    parameter that is undefined is **not** treated as a scalar. If you
+    want to allow undefined values, you will have to specify `SCALAR |
+    UNDEF`.
 
-A scalar which is not a reference, such as C<10> or C<'hello'>. A
-parameter that is undefined is B<not> treated as a scalar. If you
-want to allow undefined values, you will have to specify C<SCALAR |
-UNDEF>.
+- ARRAYREF
 
-=item * ARRAYREF
+    An array reference such as `[1, 2, 3]` or `\@foo`.
 
-An array reference such as C<[1, 2, 3]> or C<\@foo>.
+- HASHREF
 
-=item * HASHREF
+    A hash reference such as `{ a => 1, b => 2 }` or `\%bar`.
 
-A hash reference such as C<< { a => 1, b => 2 } >> or C<\%bar>.
+- CODEREF
 
-=item * CODEREF
+    A subroutine reference such as `\&foo_sub` or `sub { print "hello" }`.
 
-A subroutine reference such as C<\&foo_sub> or C<sub { print "hello" }>.
+- GLOB
 
-=item * GLOB
+    This one is a bit tricky. A glob would be something like `*FOO`, but
+    not `\*FOO`, which is a glob reference. It should be noted that this
+    trick:
 
-This one is a bit tricky. A glob would be something like C<*FOO>, but
-not C<\*FOO>, which is a glob reference. It should be noted that this
-trick:
+        my $fh = do { local *FH; };
 
-    my $fh = do { local *FH; };
+    makes `$fh` a glob, not a glob reference. On the other hand, the
+    return value from `Symbol::gensym` is a glob reference. Either can
+    be used as a file or directory handle.
 
-makes C<$fh> a glob, not a glob reference. On the other hand, the
-return value from C<Symbol::gensym> is a glob reference. Either can
-be used as a file or directory handle.
+- GLOBREF
 
-=item * GLOBREF
+    A glob reference such as `\*FOO`. See the [GLOB](https://metacpan.org/pod/GLOB) entry above
+    for more details.
 
-A glob reference such as C<\*FOO>. See the L<GLOB|GLOB> entry above
-for more details.
+- SCALARREF
 
-=item * SCALARREF
+    A reference to a scalar such as `\$x`.
 
-A reference to a scalar such as C<\$x>.
+- UNDEF
 
-=item * UNDEF
+    An undefined value
 
-An undefined value
+- OBJECT
 
-=item * OBJECT
+    A blessed reference.
 
-A blessed reference.
+- BOOLEAN
 
-=item * BOOLEAN
+    This is a special option, and is just a shortcut for `UNDEF | SCALAR`.
 
-This is a special option, and is just a shortcut for C<UNDEF | SCALAR>.
+- HANDLE
 
-=item * HANDLE
-
-This option is also special, and is just a shortcut for C<GLOB |
-GLOBREF>. However, it seems likely that most people interested in
-either globs or glob references are likely to really be interested in
-whether the parameter in question could be a valid file or directory
-handle.
-
-=back
+    This option is also special, and is just a shortcut for `GLOB |
+    GLOBREF`. However, it seems likely that most people interested in
+    either globs or glob references are likely to really be interested in
+    whether the parameter in question could be a valid file or directory
+    handle.
 
 To specify that a parameter must be of a given type when using named
 parameters, do this:
@@ -334,7 +257,7 @@ parameters, do this:
     );
 
 If a parameter can be of more than one type, just use the bitwise or
-(C<|>) operator to combine them.
+(`|`) operator to combine them.
 
     validate( @_, { foo => { type => GLOB | GLOBREF } );
 
@@ -342,30 +265,30 @@ For positional parameters, this can be specified as follows:
 
     validate_pos( @_, { type => SCALAR | ARRAYREF }, { type => CODEREF } );
 
-=head2 Interface Validation
+## Interface Validation
 
 To specify that a parameter is expected to have a certain set of
 methods, we can do the following:
 
-    validate(
-        @_, {
-            foo =>
-                # just has to be able to ->bar
-                { can => 'bar' }
-        }
-    );
+       validate(
+           @_, {
+               foo =>
+                   # just has to be able to ->bar
+                   { can => 'bar' }
+           }
+       );
 
- ... or ...
+    ... or ...
 
-    validate(
-        @_, {
-            foo =>
-                # must be able to ->bar and ->print
-                { can => [qw( bar print )] }
-        }
-    );
+       validate(
+           @_, {
+               foo =>
+                   # must be able to ->bar and ->print
+                   { can => [qw( bar print )] }
+           }
+       );
 
-=head2 Class Validation
+## Class Validation
 
 A word of warning. When constructing your external interfaces, it is
 probably better to specify what methods you expect an object to
@@ -375,20 +298,20 @@ will make your API much more flexible.
 With that said, if you want to validate that an incoming parameter
 belongs to a class (or child class) or classes, do:
 
-    validate(
-        @_,
-        { foo => { isa => 'My::Frobnicator' } }
-    );
+       validate(
+           @_,
+           { foo => { isa => 'My::Frobnicator' } }
+       );
 
- ... or ...
+    ... or ...
 
-    validate(
-        @_,
-        # must be both, not either!
-        { foo => { isa => [qw( My::Frobnicator IO::Handle )] } }
-    );
+       validate(
+           @_,
+           # must be both, not either!
+           { foo => { isa => [qw( My::Frobnicator IO::Handle )] } }
+       );
 
-=head2 Regex Validation
+## Regex Validation
 
 If you want to specify that a given parameter must match a specific
 regular expression, this can be done with "regex" spec key. For
@@ -400,20 +323,20 @@ example:
     );
 
 The value of the "regex" key may be either a string or a pre-compiled
-regex created via C<qr>.
+regex created via `qr`.
 
 If the value being checked against a regex is undefined, the regex is
 explicitly checked against the empty string ('') instead, in order to
 avoid "Use of uninitialized value" warnings.
 
-The C<Regexp::Common> module on CPAN is an excellent source of regular
+The `Regexp::Common` module on CPAN is an excellent source of regular
 expressions suitable for validating input.
 
-=head2 Callback Validation
+## Callback Validation
 
 If none of the above are enough, it is possible to pass in one or more
 callbacks to validate the parameter. The callback will be given the
-B<value> of the parameter as its first argument. Its second argument
+**value** of the parameter as its first argument. Its second argument
 will be all the parameters, as a reference to either a hash or array.
 Callbacks are specified as hash reference. The key is an id for the
 callback (used in error messages) and the value is a subroutine
@@ -446,20 +369,20 @@ reference, such as:
 
 The callback should return a true value if the value is valid. If not, it can
 return false or die. If you return false, a generic error message will be
-thrown by C<Params::Validate>.
+thrown by `Params::Validate`.
 
 If your callback dies instead you can provide a custom error message. If the
 callback dies with a plain string, this string will be appended to an
-exception message generated by C<Params::Validate>. If the callback dies with
+exception message generated by `Params::Validate`. If the callback dies with
 a reference (blessed or not), then this will be rethrown as-is by
-C<Params::Validate>.
+`Params::Validate`.
 
-Any existing C<$SIG{__DIE__}> value will be temporarily removed while
+Any existing `$SIG{__DIE__}` value will be temporarily removed while
 callbacks are called in order to prevent the die handler from tampering with
 the error thrown by the callback. However, under Perl 5.8.x this cannot be
-implemented in the XS version of C<Params::Validate>.
+implemented in the XS version of `Params::Validate`.
 
-=head2 Untainting
+## Untainting
 
 If you want values untainted, set the "untaint" key in a spec hashref
 to a true value, like this:
@@ -473,14 +396,14 @@ to a true value, like this:
 
 This will untaint the "foo" parameter if the parameters are valid.
 
-Note that untainting is only done if I<all parameters> are valid.
+Note that untainting is only done if _all parameters_ are valid.
 Also, only the return values are untainted, not the original values
 passed into the validation function.
 
 Asking for untainting of a reference value will not do anything, as
-C<Params::Validate> will only attempt to untaint the reference itself.
+`Params::Validate` will only attempt to untaint the reference itself.
 
-=head2 Mandatory/Optional Revisited
+## Mandatory/Optional Revisited
 
 If you want to specify something such as type or interface, plus the
 fact that a parameter can be optional, do this:
@@ -503,7 +426,7 @@ or this for positional parameters:
 By default, parameters are assumed to be mandatory unless specified as
 optional.
 
-=head2 Dependencies
+## Dependencies
 
 It also possible to specify that a given optional parameter depends on
 the presence of one or more other optional parameters.
@@ -520,14 +443,14 @@ the presence of one or more other optional parameters.
         }
     );
 
-In this case, "cc_number", "cc_expiration", and "cc_holder_name" are
-all optional. However, if "cc_number" is provided, then
-"cc_expiration" and "cc_holder_name" must be provided as well.
+In this case, "cc\_number", "cc\_expiration", and "cc\_holder\_name" are
+all optional. However, if "cc\_number" is provided, then
+"cc\_expiration" and "cc\_holder\_name" must be provided as well.
 
 This allows you to group together sets of parameters that all must be
 provided together.
 
-The C<validate_pos()> version of dependencies is slightly different,
+The `validate_pos()` version of dependencies is slightly different,
 in that you can only depend on one other parameter. Also, if for
 example, the second parameter 2 depends on the fourth parameter, then
 it implies a dependency on the third parameter as well. This is
@@ -535,12 +458,12 @@ because if the fourth parameter is required, then the user must also
 provide a third parameter so that there can be four parameters in
 total.
 
-C<Params::Validate> will die if you try to depend on a parameter not
+`Params::Validate` will die if you try to depend on a parameter not
 declared as part of your parameter specification.
 
-=head2 Specifying defaults
+## Specifying defaults
 
-If the C<validate()> or C<validate_pos()> functions are called in a list
+If the `validate()` or `validate_pos()` functions are called in a list
 context, they will return a hash or containing the original parameters plus
 defaults as indicated by the validation spec.
 
@@ -548,7 +471,7 @@ If the function is not called in a list context, providing a default
 in the validation spec still indicates that the parameter is optional.
 
 The hash or array returned from the function will always be a copy of
-the original parameters, in order to leave C<@_> untouched for the
+the original parameters, in order to leave `@_` untouched for the
 calling function.
 
 Simple examples of defaults would be:
@@ -560,26 +483,26 @@ Simple examples of defaults would be:
 In scalar context, a hash reference or array reference will be
 returned, as appropriate.
 
-=head1 USAGE NOTES
+# USAGE NOTES
 
-=head2 Validation failure
+## Validation failure
 
-By default, when validation fails C<Params::Validate> calls
-C<Carp::confess()>. This can be overridden by setting the C<on_fail>
-option, which is described in the L<"GLOBAL" OPTIONS|"GLOBAL" OPTIONS>
+By default, when validation fails `Params::Validate` calls
+`Carp::confess()`. This can be overridden by setting the `on_fail`
+option, which is described in the ["GLOBAL" OPTIONS](https://metacpan.org/pod/&#x22;GLOBAL&#x22;&#x20;OPTIONS)
 section.
 
-=head2 Method calls
+## Method calls
 
 When using this module to validate the parameters passed to a method
 call, you will probably want to remove the class/object from the
-parameter list B<before> calling C<validate()> or C<validate_pos()>.
+parameter list **before** calling `validate()` or `validate_pos()`.
 If your method expects named parameters, then this is necessary for
-the C<validate()> function to actually work, otherwise C<@_> will not
+the `validate()` function to actually work, otherwise `@_` will not
 be usable as a hash, because it will first have your object (or
-class) B<followed> by a set of keys and values.
+class) **followed** by a set of keys and values.
 
-Thus the idiomatic usage of C<validate()> in a method call will look
+Thus the idiomatic usage of `validate()` in a method call will look
 something like this:
 
     sub method {
@@ -593,7 +516,7 @@ something like this:
         );
     }
 
-=head2 Speeding Up Validation
+## Speeding Up Validation
 
 In most cases, the validation spec will remain the same for each call to a
 subroutine. In that case, you can speed up validation by defining the
@@ -604,7 +527,7 @@ validation spec just once, rather than on each call to the subroutine:
         my %params = validate( @_, \%spec );
     }
 
-You can also use the C<state> feature to do this:
+You can also use the `state` feature to do this:
 
     use feature 'state';
 
@@ -613,21 +536,21 @@ You can also use the C<state> feature to do this:
         my %params = validate( @_, $spec );
     }
 
-=head1 "GLOBAL" OPTIONS
+# "GLOBAL" OPTIONS
 
-Because the API for the C<validate()> and C<validate_pos()> functions does not
+Because the API for the `validate()` and `validate_pos()` functions does not
 make it possible to specify any options other than the validation spec, it is
 possible to set some options as pseudo-'globals'. These allow you to specify
 such things as whether or not the validation of named parameters should be
 case sensitive, for one example.
 
 These options are called pseudo-'globals' because these settings are
-B<only applied to calls originating from the package that set the
-options>.
+**only applied to calls originating from the package that set the
+options**.
 
-In other words, if I am in package C<Foo> and I call
-C<validation_options()>, those options are only in effect when I call
-C<validate()> from package C<Foo>.
+In other words, if I am in package `Foo` and I call
+`validation_options()`, those options are only in effect when I call
+`validate()` from package `Foo`.
 
 While this is quite different from how most other modules operate, I
 feel that this is necessary in able to make it possible for one
@@ -636,101 +559,97 @@ modules that also use Params::Validate, perhaps with different
 options set.
 
 The downside to this is that if you are writing an app with a standard
-calling style for all functions, and your app has ten modules, B<each
-module must include a call to C<validation_options()>>. You could of
+calling style for all functions, and your app has ten modules, **each
+module must include a call to `validation_options()`**. You could of
 course write a module that all your modules use which uses various
 trickery to do this when imported.
 
-=head2 Options
+## Options
 
-=over 4
+- normalize\_keys => $callback
 
-=item * normalize_keys => $callback
+    This option is only relevant when dealing with named parameters.
 
-This option is only relevant when dealing with named parameters.
+    This callback will be used to transform the hash keys of both the
+    parameters and the parameter spec when `validate()` or
+    `validate_with()` are called.
 
-This callback will be used to transform the hash keys of both the
-parameters and the parameter spec when C<validate()> or
-C<validate_with()> are called.
+    Any alterations made by this callback will be reflected in the
+    parameter hash that is returned by the validation function. For
+    example:
 
-Any alterations made by this callback will be reflected in the
-parameter hash that is returned by the validation function. For
-example:
+        sub foo {
+            return validate_with(
+                params => \@_,
+                spec   => { foo => { type => SCALAR } },
+                normalize_keys =>
+                    sub { my $k = shift; $k =~ s/^-//; return uc $k },
+            );
 
-    sub foo {
-        return validate_with(
-            params => \@_,
-            spec   => { foo => { type => SCALAR } },
-            normalize_keys =>
-                sub { my $k = shift; $k =~ s/^-//; return uc $k },
-        );
+        }
 
-    }
+        %p = foo( foo => 20 );
 
-    %p = foo( foo => 20 );
+        # $p{FOO} is now 20
 
-    # $p{FOO} is now 20
+        %p = foo( -fOo => 50 );
 
-    %p = foo( -fOo => 50 );
+        # $p{FOO} is now 50
 
-    # $p{FOO} is now 50
+    The callback must return a defined value.
 
-The callback must return a defined value.
+    If a callback is given then the deprecated "ignore\_case" and
+    "strip\_leading" options are ignored.
 
-If a callback is given then the deprecated "ignore_case" and
-"strip_leading" options are ignored.
+- allow\_extra => $boolean
 
-=item * allow_extra => $boolean
+    If true, then the validation routine will allow extra parameters not
+    named in the validation specification. In the case of positional
+    parameters, this allows an unlimited number of maximum parameters
+    (though a minimum may still be set). Defaults to false.
 
-If true, then the validation routine will allow extra parameters not
-named in the validation specification. In the case of positional
-parameters, this allows an unlimited number of maximum parameters
-(though a minimum may still be set). Defaults to false.
+- on\_fail => $callback
 
-=item * on_fail => $callback
+    If given, this callback will be called whenever a validation check
+    fails. It will be called with a single parameter, which will be a
+    string describing the failure. This is useful if you wish to have
+    this module throw exceptions as objects rather than as strings, for
+    example.
 
-If given, this callback will be called whenever a validation check
-fails. It will be called with a single parameter, which will be a
-string describing the failure. This is useful if you wish to have
-this module throw exceptions as objects rather than as strings, for
-example.
+    This callback is expected to `die()` internally. If it does not, the
+    validation will proceed onwards, with unpredictable results.
 
-This callback is expected to C<die()> internally. If it does not, the
-validation will proceed onwards, with unpredictable results.
+    The default is to simply use the Carp module's `confess()` function.
 
-The default is to simply use the Carp module's C<confess()> function.
+- stack\_skip => $number
 
-=item * stack_skip => $number
+    This tells Params::Validate how many stack frames to skip when finding
+    a subroutine name to use in error messages. By default, it looks one
+    frame back, at the immediate caller to `validate()` or
+    `validate_pos()`. If this option is set, then the given number of
+    frames are skipped instead.
 
-This tells Params::Validate how many stack frames to skip when finding
-a subroutine name to use in error messages. By default, it looks one
-frame back, at the immediate caller to C<validate()> or
-C<validate_pos()>. If this option is set, then the given number of
-frames are skipped instead.
+- ignore\_case => $boolean
 
-=item * ignore_case => $boolean
+    DEPRECATED
 
-DEPRECATED
+    This is only relevant when dealing with named parameters. If it is
+    true, then the validation code will ignore the case of parameter
+    names. Defaults to false.
 
-This is only relevant when dealing with named parameters. If it is
-true, then the validation code will ignore the case of parameter
-names. Defaults to false.
+- strip\_leading => $characters
 
-=item * strip_leading => $characters
+    DEPRECATED
 
-DEPRECATED
+    This too is only relevant when dealing with named parameters. If this
+    is given then any parameters starting with these characters will be
+    considered equivalent to parameters without them entirely. For
+    example, if this is specified as '-', then `-foo` and `foo` would be
+    considered identical.
 
-This too is only relevant when dealing with named parameters. If this
-is given then any parameters starting with these characters will be
-considered equivalent to parameters without them entirely. For
-example, if this is specified as '-', then C<-foo> and C<foo> would be
-considered identical.
+# PER-INVOCATION OPTIONS
 
-=back
-
-=head1 PER-INVOCATION OPTIONS
-
-The C<validate_with()> function can be used to set the options listed
+The `validate_with()` function can be used to set the options listed
 above on a per-invocation basis. For example:
 
     my %p = validate_with(
@@ -771,9 +690,9 @@ parameters are assumed to be positional.
         called      => 'The Quux::Baz class constructor',
     );
 
-=head1 DISABLING VALIDATION
+# DISABLING VALIDATION
 
-If the environment variable C<PERL_NO_VALIDATION> is set to something
+If the environment variable `PERL_NO_VALIDATION` is set to something
 true, then validation is turned off. This may be useful if you only
 want to use this module during development but don't want the speed
 hit during production.
@@ -782,8 +701,8 @@ The only error that will be caught will be when an odd number of
 parameters are passed into a function/method that expects a hash.
 
 If you want to selectively turn validation on and off at runtime, you
-can directly set the C<$Params::Validate::NO_VALIDATION> global
-variable. It is B<strongly> recommended that you B<localize> any
+can directly set the `$Params::Validate::NO_VALIDATION` global
+variable. It is **strongly** recommended that you **localize** any
 changes to this variable, because other modules you are using may
 expect validation to be on when they execute. For example:
 
@@ -805,15 +724,15 @@ expect validation to be on when they execute. For example:
 But if you want to shoot yourself in the foot and just turn it off, go
 ahead!
 
-=head1 TAINT MODE
+# TAINT MODE
 
 The XS implementation of this module has some problems Under taint mode with
-version of Perl before 5.14. If validation I<fails>, then instead of getting
+version of Perl before 5.14. If validation _fails_, then instead of getting
 the expected error message you'll get a message like "Insecure dependency in
-eval_sv". This can be worked around by either untainting the arguments
+eval\_sv". This can be worked around by either untainting the arguments
 yourself, using the pure Perl implementation, or upgrading your Perl.
 
-=head1 LIMITATIONS
+# LIMITATIONS
 
 Right now there is no way (short of a callback) to specify that
 something must be of one of a list of classes, or that it must possess
@@ -823,7 +742,7 @@ future.
 Ideally, there would be only one validation function. If someone
 figures out how to do this, please let me know.
 
-=head1 SUPPORT
+# SUPPORT
 
 Please submit bugs and patches to the CPAN RT system at
 http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params%3A%3AValidate or
@@ -831,14 +750,14 @@ via email at bug-params-validate@rt.cpan.org.
 
 Support questions can be sent to Dave at autarch@urth.org.
 
-=head1 DONATIONS
+# DONATIONS
 
 If you'd like to thank me for the work I've done on this module,
 please consider making a "donation" to me via PayPal. I spend a lot of
 free time creating free software, and would appreciate any support
 you'd care to offer.
 
-Please note that B<I am not suggesting that you must do this> in order
+Please note that **I am not suggesting that you must do this** in order
 for me to continue working on this particular software. I will
 continue to do so, inasmuch as I have in the past, for as long as it
 interests me.
@@ -850,44 +769,22 @@ best.
 
 To donate, log into PayPal and send money to autarch@urth.org or use
 the button on this page:
-L<http://www.urth.org/~autarch/fs-donation.html>
+[http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html)
 
-=head1 AUTHORS
+# AUTHORS
 
-=over 4
+- Dave Rolsky <autarch@urth.org>
+- Ilya Martynov <ilya@martynov.org>
 
-=item *
+# CONTRIBUTORS
 
-Dave Rolsky <autarch@urth.org>
+- J.R. Mash <jmash.code@gmail.com>
+- Olivier Mengué <dolmen@cpan.org>
 
-=item *
-
-Ilya Martynov <ilya@martynov.org>
-
-=back
-
-=head1 CONTRIBUTORS
-
-=for stopwords J.R. Mash Olivier Mengué
-
-=over 4
-
-=item *
-
-J.R. Mash <jmash.code@gmail.com>
-
-=item *
-
-Olivier Mengué <dolmen@cpan.org>
-
-=back
-
-=head1 COPYRIGHT AND LICENSE
+# COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2014 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut
+    The Artistic License 2.0 (GPL Compatible)

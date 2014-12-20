@@ -3,16 +3,16 @@
 use strict;
 use warnings;
 
-use Module::Build 0.3601;
+use Module::Build 0.28;
 
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.3601"
+    "Module::Build" => "0.28"
   },
   "c_source" => "c",
   "configure_requires" => {
-    "Module::Build" => "0.3601"
+    "Module::Build" => "0.28"
   },
   "dist_abstract" => "Validate method/function parameters",
   "dist_author" => [
@@ -20,7 +20,7 @@ my %module_build_args = (
     "Ilya Martynov <ilya\@martynov.org>"
   ],
   "dist_name" => "Params-Validate",
-  "dist_version" => "1.13",
+  "dist_version" => "1.14",
   "license" => "artistic_2",
   "module_name" => "Params::Validate",
   "recommends" => {},
@@ -41,8 +41,11 @@ my %module_build_args = (
   "script_files" => [],
   "test_requires" => {
     "Devel::Peek" => 0,
+    "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.88",
     "Test::Requires" => 0,
@@ -57,9 +60,12 @@ my %module_build_args = (
 
 my %fallback_build_requires = (
   "Devel::Peek" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
-  "Module::Build" => "0.3601",
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "Module::Build" => "0.28",
   "Test::Fatal" => 0,
   "Test::More" => "0.88",
   "Test::Requires" => 0,

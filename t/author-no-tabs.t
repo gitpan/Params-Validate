@@ -1,15 +1,15 @@
 
 BEGIN {
-  unless ($ENV{RELEASE_TESTING}) {
+  unless ($ENV{AUTHOR_TESTING}) {
     require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    Test::More::plan(skip_all => 'these tests are for testing by the author');
   }
 }
 
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.07
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.09
 
 use Test::More 0.88;
 use Test::NoTabs;
@@ -22,6 +22,9 @@ my @files = (
     'lib/Params/Validate/XS.pm',
     'lib/Params/ValidatePP.pm',
     'lib/Params/ValidateXS.pm',
+    't/00-compile.t',
+    't/00-report-prereqs.dd',
+    't/00-report-prereqs.t',
     't/01-validate.t',
     't/02-noop.t',
     't/03-attribute.t',
@@ -56,7 +59,12 @@ my @files = (
     't/33-keep-errsv.t',
     't/34-recursive-validation.t',
     't/35-default-xs-bug.t',
-    't/35-large-arrays.t',
+    't/36-large-arrays.t',
+    't/37-exports.t',
+    't/38-callback-message.t',
+    't/author-eol.t',
+    't/author-no-tabs.t',
+    't/author-pod-spell.t',
     't/lib/PVTests.pm',
     't/lib/PVTests/Callbacks.pm',
     't/lib/PVTests/Defaults.pm',
@@ -64,13 +72,11 @@ my @files = (
     't/lib/PVTests/Standard.pm',
     't/lib/PVTests/With.pm',
     't/release-cpan-changes.t',
-    't/release-eol.t',
-    't/release-no-tabs.t',
     't/release-pod-coverage.t',
     't/release-pod-linkcheck.t',
     't/release-pod-no404s.t',
-    't/release-pod-spell.t',
     't/release-pod-syntax.t',
+    't/release-portability.t',
     't/release-pp-01-validate.t',
     't/release-pp-02-noop.t',
     't/release-pp-03-attribute.t',
@@ -105,8 +111,11 @@ my @files = (
     't/release-pp-33-keep-errsv.t',
     't/release-pp-34-recursive-validation.t',
     't/release-pp-35-default-xs-bug.t',
-    't/release-pp-35-large-arrays.t',
+    't/release-pp-36-large-arrays.t',
+    't/release-pp-37-exports.t',
+    't/release-pp-38-callback-message.t',
     't/release-pp-is-loaded.t',
+    't/release-synopsis.t',
     't/release-xs-is-loaded.t',
     't/release-xs-segfault.t'
 );

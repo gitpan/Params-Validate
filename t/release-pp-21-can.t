@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN {
     unless ( $ENV{RELEASE_TESTING} ) {
-        plan skip_all => 'these tests are for testing by the release';
+        plan skip_all => 'these tests are for release testing';
     }
 
     $ENV{PV_TEST_PERL} = 1;
