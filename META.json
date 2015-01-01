@@ -81,26 +81,26 @@
    "provides" : {
       "Attribute::Params::Validate" : {
          "file" : "lib/Attribute/Params/Validate.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Params::Validate" : {
          "file" : "lib/Params/Validate.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Params::Validate::Constants" : {
          "file" : "lib/Params/Validate/Constants.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Params::Validate::PP" : {
          "file" : "lib/Params/Validate/PP.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Params::Validate::XS" : {
          "file" : "lib/Params/Validate/XS.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-params-validate@rt.cpan.org",
@@ -113,7 +113,7 @@
          "web" : "https://github.com/autarch/Params-Validate"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016003"
@@ -160,17 +160,17 @@
                }
             },
             "name" : "@DROLSKY/Git::GatherDir",
-            "version" : "2.028"
+            "version" : "2.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@DROLSKY/GitHub::Meta",
-            "version" : "0.38"
+            "version" : "0.39"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
             "name" : "@DROLSKY/GitHub::Update",
-            "version" : "0.38"
+            "version" : "0.39"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -196,7 +196,7 @@
                }
             },
             "name" : "@DROLSKY/MetaProvides::Package",
-            "version" : "2.001002"
+            "version" : "2.002000"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
@@ -367,7 +367,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Git::Describe",
             "name" : "@DROLSKY/Git::Describe",
-            "version" : "0.003"
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
@@ -565,7 +565,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Check",
-            "version" : "2.028"
+            "version" : "2.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -593,7 +593,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Commit",
-            "version" : "2.028"
+            "version" : "2.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -601,7 +601,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : null,
                   "signed" : 0,
-                  "tag" : "v1.14",
+                  "tag" : "v1.15",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
@@ -611,7 +611,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Tag",
-            "version" : "2.028"
+            "version" : "2.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -627,7 +627,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Push",
-            "version" : "2.028"
+            "version" : "2.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -704,7 +704,7 @@
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "1"
+            "is_trial" : "0"
          },
          "version" : "5.029"
       }

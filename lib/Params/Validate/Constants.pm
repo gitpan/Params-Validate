@@ -1,5 +1,5 @@
 package Params::Validate::Constants;
-$Params::Validate::Constants::VERSION = '1.14'; # TRIAL
+$Params::Validate::Constants::VERSION = '1.15';
 use strict;
 use warnings;
 

@@ -1,7 +1,7 @@
 package Params::Validate;
-# git description: v1.13-21-ge6e71db
+# git description: v1.14-3-g8d54c1b
 
-$Params::Validate::VERSION = '1.14'; # TRIAL
+$Params::Validate::VERSION = '1.15';
 use 5.008001;
 
 use strict;
@@ -75,7 +75,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -884,7 +884,7 @@ Olivier Mengué <dolmen@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2001 - 2015 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 
