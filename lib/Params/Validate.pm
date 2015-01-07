@@ -1,7 +1,7 @@
 package Params::Validate;
-# git description: v1.14-3-g8d54c1b
+# git description: v1.15-13-g924e8d4
 
-$Params::Validate::VERSION = '1.15';
+$Params::Validate::VERSION = '1.16';
 use 5.008001;
 
 use strict;
@@ -75,7 +75,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

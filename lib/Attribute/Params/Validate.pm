@@ -1,5 +1,5 @@
 package Attribute::Params::Validate;
-$Attribute::Params::Validate::VERSION = '1.15';
+$Attribute::Params::Validate::VERSION = '1.16';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ Attribute::Params::Validate - Define validation through subroutine attributes
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

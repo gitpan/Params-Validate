@@ -72,6 +72,7 @@ my @files = (
     't/lib/PVTests/Standard.pm',
     't/lib/PVTests/With.pm',
     't/release-cpan-changes.t',
+    't/release-memory-leak.t',
     't/release-pod-coverage.t',
     't/release-pod-linkcheck.t',
     't/release-pod-no404s.t',
